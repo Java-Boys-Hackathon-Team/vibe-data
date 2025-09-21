@@ -1,0 +1,59 @@
+services:
+
+  vibe-data:
+    build: .
+    command: ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-Dconfig.file=/app/config/application-prod.properties", "-jar", "vibe-data.jar"]
+    volumes:
+      - './src/main/resources/application-prod.properties:/app/config/application-prod.properties'
+      - ./sources:/app/sources
+    restart: always
+    container_name: vibe-data
+    ports:
+      - "8086:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - PG_DATASOURCE_URL=jdbc:postgresql://vibe-data-db:5432/vibedata
+      - PG_NAME=pgadmin
+      - PG_PASS=pgadmin
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:192.168.88.151"
+    tty: true
+    depends_on:
+      - vibe-data-db
+
+  vibe-data-db:
+    build:
+      dockerfile: ./Dockerfile
+      context: postgres
+    restart: always
+    container_name: vibe-data-db
+    ports:
+      - "25436:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+    environment:
+      - POSTGRES_USER=pgadmin
+      - POSTGRES_PASSWORD=pgadmin
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "kuramshin.py@yandex.ru"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+      PGADMIN_LISTEN_PORT: 80
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "5054:80"
+    depends_on:
+      - vibe-data-db
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+    driver: local
