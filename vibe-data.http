@@ -1,5 +1,5 @@
-### GET request to example server
-GET http://localhost:8080/
+### GET Health Check
+GET http://localhost:8080/actuator/health
 Authorization: Basic YWRtaW46YWRtaW4=
 
 ###
