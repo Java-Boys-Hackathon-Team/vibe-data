@@ -24,12 +24,12 @@ public class LlmServiceImpl implements LlmService {
     private final ChatClient chatClient;
 
     @Override
-    public String llmCall(String conversationId,
-                          String systemMessage,
-                          Map<String, Object> systemVariables,
-                          String userMessage,
-                          Map<String, Object> userVariables,
-                          List<Object> tools) {
+    public String llm(String conversationId,
+                      String systemMessage,
+                      Map<String, Object> systemVariables,
+                      String userMessage,
+                      Map<String, Object> userVariables,
+                      List<Object> tools) {
 
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = prepareChatClient(
                 conversationId,
@@ -46,13 +46,13 @@ public class LlmServiceImpl implements LlmService {
     }
 
     @Override
-    public <T> T llmCallToBean(String conversationId,
-                               String systemMessage,
-                               Map<String, Object> systemVariables,
-                               String userMessage,
-                               Map<String, Object> userVariables,
-                               List<Object> tools,
-                               Class<T> classType) {
+    public <T> T callAs(String conversationId,
+                        String systemMessage,
+                        Map<String, Object> systemVariables,
+                        String userMessage,
+                        Map<String, Object> userVariables,
+                        List<Object> tools,
+                        Class<T> classType) {
 
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = prepareChatClient(
                 conversationId,
