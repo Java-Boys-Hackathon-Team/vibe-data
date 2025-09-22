@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,21 +23,9 @@ public class LlmServiceImpl implements LlmService {
     private final ChatClient chatClient;
 
     @Override
-    public String llm(String conversationId,
-                      String systemMessage,
-                      Map<String, Object> systemVariables,
-                      String userMessage,
-                      Map<String, Object> userVariables,
-                      List<Object> tools) {
+    public String llm(LlmRequest request) {
 
-        ChatClient.ChatClientRequestSpec chatClientRequestSpec = prepareChatClient(
-                conversationId,
-                systemMessage,
-                systemVariables,
-                userMessage,
-                userVariables,
-                tools
-        );
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec = prepareChatClient(request);
 
         return chatClientRequestSpec
                 .call()
@@ -46,38 +33,22 @@ public class LlmServiceImpl implements LlmService {
     }
 
     @Override
-    public <T> T callAs(String conversationId,
-                        String systemMessage,
-                        Map<String, Object> systemVariables,
-                        String userMessage,
-                        Map<String, Object> userVariables,
-                        List<Object> tools,
-                        Class<T> classType) {
+    public <T> T callAs(LlmRequest request, Class<T> classType) {
 
-        ChatClient.ChatClientRequestSpec chatClientRequestSpec = prepareChatClient(
-                conversationId,
-                systemMessage,
-                systemVariables,
-                userMessage,
-                userVariables,
-                tools
-        );
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec = prepareChatClient(request);
 
         return chatClientRequestSpec
                 .call()
                 .entity(classType);
     }
 
-    private ChatClient.ChatClientRequestSpec prepareChatClient(String conversationId,
-                                                               String systemMessage,
-                                                               Map<String, Object> systemVariables,
-                                                               String userMessage,
-                                                               Map<String, Object> userVariables,
-                                                               List<Object> tools) {
+    private ChatClient.ChatClientRequestSpec prepareChatClient(LlmRequest request) {
         List<Message> messages = new ArrayList<>();
 
+        String systemMessage = request.getSystemMessage();
         if (systemMessage != null) {
             Message systemMsg;
+            var systemVariables = request.getSystemVariables();
             if (systemVariables != null && !systemVariables.isEmpty()) {
                 SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(systemMessage);
                 systemMsg = systemPromptTemplate.createMessage(systemVariables);
@@ -87,8 +58,10 @@ public class LlmServiceImpl implements LlmService {
             messages.add(systemMsg);
         }
 
+        String userMessage = request.getUserMessage();
         if (userMessage != null) {
             Message userMsg;
+            var userVariables = request.getUserVariables();
             if (userVariables != null && !userVariables.isEmpty()) {
                 PromptTemplate promptTemplate = new PromptTemplate(userMessage);
                 userMsg = promptTemplate.createMessage(userVariables);
@@ -102,10 +75,12 @@ public class LlmServiceImpl implements LlmService {
 
         var chatClientRequestSpec = chatClient.prompt(prompt);
 
+        String conversationId = request.getConversationId();
         if (conversationId != null) {
             chatClientRequestSpec = chatClientRequestSpec.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId));
         }
 
+        List<Object> tools = request.getTools();
         if (tools != null && !tools.isEmpty()) {
             chatClientRequestSpec = chatClientRequestSpec.tools(tools);
         }
