@@ -78,15 +78,15 @@ sequenceDiagram
 
 ```bash
 # Запуск задачи
-curl -X POST https://{host}/new \
+curl -X POST http://{host}/new \
   -H 'Authorization: Basic ...' -H 'Content-Type: application/json' \
   -d @payload.json
 
 # Проверка статуса
-curl "https://{host}/status?task_id=6c12bd3f-80b1-4c0a-84ab-d3160d2e8f7a"
+curl "http://{host}/status?task_id=6c12bd3f-80b1-4c0a-84ab-d3160d2e8f7a"
 
 # Получение результата
-curl "https://{host}/getresult?task_id=6c12bd3f-80b1-4c0a-84ab-d3160d2e8f7a"
+curl "http://{host}/getresult?task_id=6c12bd3f-80b1-4c0a-84ab-d3160d2e8f7a"
 ```
 
 ---
