@@ -8,12 +8,12 @@ servers:
     variables:
       host:
         default: localhost:8080
+security:
+  - basicAuth: []
 paths:
   /new:
     post:
       summary: Запуск задачи анализа
-      security:
-        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
