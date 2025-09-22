@@ -23,7 +23,7 @@ public class LlmServiceImpl implements LlmService {
     private final ChatClient chatClient;
 
     @Override
-    public String llm(LlmRequest request) {
+    public String call(LlmRequest request) {
 
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = prepareChatClient(request);
 
