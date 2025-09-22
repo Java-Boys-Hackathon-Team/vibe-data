@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Vibe Data API
   version: "1.0"
-  description: LLM-сервис оптимизации структуры БД и SQL
+  description: AI-агент для оптимизации структуры БД и SQL-запросов
 servers:
   - url: http://{host}
     variables:
