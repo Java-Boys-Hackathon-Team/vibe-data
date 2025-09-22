@@ -160,6 +160,31 @@ $$
 * `task_result(task_id fk, ddl jsonb, migrations jsonb, queries jsonb)` — готовый пакет.
 * Индексы на `status, created_at` для выборок оркестратора.
 
+### ER-диаграмма (Mermaid)
+```mermaid
+erDiagram
+    TASKS {
+        uuid id PK
+        enum status
+        timestamp created_at
+        timestamp updated_at
+        text error
+    }
+    TASK_INPUT {
+        uuid task_id FK
+        jsonb payload
+    }
+    TASK_RESULT {
+        uuid task_id FK
+        jsonb ddl
+        jsonb migrations
+        jsonb queries
+    }
+
+    TASKS ||--|| TASK_INPUT : has_input
+    TASKS ||--o| TASK_RESULT : has_result
+```
+
 ---
 
 ## Безопасность и соответствие
