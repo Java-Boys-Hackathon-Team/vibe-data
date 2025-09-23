@@ -1,4 +1,4 @@
-package ru.javaboys.vibe_data.domain.json;
+package ru.javaboys.vibe_data.domain.jsonb;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DdlStatement {
+public class RewrittenQuery {
     @NotBlank
-    private String statement;
+    private String queryid;
+
+    @NotBlank
+    private String query;
 }

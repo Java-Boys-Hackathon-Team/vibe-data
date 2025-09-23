@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import ru.javaboys.vibe_data.domain.converter.TaskInputPayloadJsonConverter;
-import ru.javaboys.vibe_data.domain.json.TaskInputPayload;
+import ru.javaboys.vibe_data.domain.jsonb.TaskInputPayload;
 
 @Getter
 @Setter

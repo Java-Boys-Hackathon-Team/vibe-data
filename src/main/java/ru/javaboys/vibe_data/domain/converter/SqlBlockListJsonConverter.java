@@ -2,7 +2,7 @@ package ru.javaboys.vibe_data.domain.converter;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.persistence.Converter;
-import ru.javaboys.vibe_data.domain.json.SqlBlock;
+import ru.javaboys.vibe_data.domain.jsonb.SqlBlock;
 
 import java.util.List;
 

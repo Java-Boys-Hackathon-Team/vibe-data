@@ -1,4 +1,4 @@
-package ru.javaboys.vibe_data.domain.json;
+package ru.javaboys.vibe_data.domain.jsonb;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

@@ -16,8 +16,8 @@ import lombok.Setter;
 import lombok.ToString;
 import ru.javaboys.vibe_data.domain.converter.RewrittenQueryListJsonConverter;
 import ru.javaboys.vibe_data.domain.converter.SqlBlockListJsonConverter;
-import ru.javaboys.vibe_data.domain.json.RewrittenQuery;
-import ru.javaboys.vibe_data.domain.json.SqlBlock;
+import ru.javaboys.vibe_data.domain.jsonb.RewrittenQuery;
+import ru.javaboys.vibe_data.domain.jsonb.SqlBlock;
 
 import java.util.List;
 
