@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1758621206193-1" author="zen (generated)">
+        <createTable tableName="task_input">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_task_input"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="task_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payload" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1758621206193-2" author="zen (generated)">
+        <createTable tableName="task_result">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_task_result"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="task_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ddl" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+            <column name="migrations" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+            <column name="queries" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1758621206193-3" author="zen (generated)">
+        <createTable tableName="tasks">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tasks"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="error" type="text"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1758621206193-4" author="zen (generated)">
+        <addUniqueConstraint columnNames="task_id" constraintName="UC_TASK_INPUT_TASK" tableName="task_input"/>
+    </changeSet>
+    <changeSet id="1758621206193-5" author="zen (generated)">
+        <addUniqueConstraint columnNames="task_id" constraintName="UC_TASK_RESULT_TASK" tableName="task_result"/>
+    </changeSet>
+    <changeSet id="1758621206193-6" author="zen (generated)">
+        <createIndex indexName="idx_tasks_created_at" tableName="tasks">
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1758621206193-7" author="zen (generated)">
+        <createIndex indexName="idx_tasks_status" tableName="tasks">
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1758621206193-8" author="zen (generated)">
+        <addForeignKeyConstraint baseColumnNames="task_id" baseTableName="task_input"
+                                 constraintName="FK_TASK_INPUT_ON_TASK" referencedColumnNames="id"
+                                 referencedTableName="tasks"/>
+    </changeSet>
+    <changeSet id="1758621206193-9" author="zen (generated)">
+        <addForeignKeyConstraint baseColumnNames="task_id" baseTableName="task_result"
+                                 constraintName="FK_TASK_RESULT_ON_TASK" referencedColumnNames="id"
+                                 referencedTableName="tasks"/>
+    </changeSet>
+
+</databaseChangeLog>
