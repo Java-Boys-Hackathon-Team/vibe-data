@@ -6,7 +6,7 @@ import ru.javaboys.vibe_data.domain.jsonb.SqlBlock;
 
 import java.util.List;
 
-@Converter(autoApply = false)
+@Converter()
 public class SqlBlockListJsonConverter extends AbstractJsonAttributeConverter<List<SqlBlock>> {
     @Override
     protected TypeReference<List<SqlBlock>> typeReference() {

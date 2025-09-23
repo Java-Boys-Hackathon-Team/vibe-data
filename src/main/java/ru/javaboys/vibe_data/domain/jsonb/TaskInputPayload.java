@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TaskInputPayload {
     @NotBlank
-    private String url; // JDBC URL
+    private String url;
 
     @NotEmpty
     @Valid
