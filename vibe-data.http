@@ -13,28 +13,39 @@ Content-Type: application/json
 {
   "url": "jdbc:trino://trino.example:8080/hive/default?user=demo&password=demo",
   "ddl": [
-    { "statement": "CREATE SCHEMA lakehouse.analytics" },
-    { "statement": "CREATE TABLE lakehouse.analytics.orders (order_id bigint, user_id bigint, amount double)" }
+    {
+      "statement": "CREATE SCHEMA lakehouse.analytics"
+    },
+    {
+      "statement": "CREATE TABLE lakehouse.analytics.orders (order_id bigint, user_id bigint, amount double)"
+    }
   ],
   "queries": [
-    { "queryid": "0197a0b2-2284-7af8-9012-fcb21e1a9785", "query": "SELECT user_id, sum(amount) FROM lakehouse.analytics.orders GROUP BY 1", "runquantity": 123 },
-    { "queryid": "q2", "query": "SELECT * FROM lakehouse.analytics.orders WHERE amount > 1000", "runquantity": 5 }
+    {
+      "queryid": "0197a0b2-2284-7af8-9012-fcb21e1a9785",
+      "query": "SELECT user_id, sum(amount) FROM lakehouse.analytics.orders GROUP BY 1",
+      "runquantity": 123
+    },
+    {
+      "queryid": "q2",
+      "query": "SELECT * FROM lakehouse.analytics.orders WHERE amount > 1000",
+      "runquantity": 5
+    }
   ]
 }
 
 > {%
-  client.test("Accepted 202", function() {
-    client.assert(response.status === 202, "Expected 202");
-  });
-  try {
-    const body = JSON.parse(response.body);
-    if (body && body.taskid) {
-      client.global.set("task_id", body.taskid);
-      client.log("Stored task_id=" + body.taskid);
+    client.test("Accepted 202", function () {
+        client.assert(response.status === 202, "Expected 202");
+    });
+    const body = typeof response.body === 'string' ? JSON.parse(response.body) : response.body;
+    if (body && (body.taskid || body.taskId)) {
+        const id = body.taskid ?? body.taskId;
+        client.global.set("task_id", id);
+        client.log("Stored task_id=" + id);
+    } else {
+        client.log("task_id not found in response: " + JSON.stringify(body));
     }
-  } catch (e) {
-    client.log("Failed to parse JSON: " + e);
-  }
 %}
 
 ###
