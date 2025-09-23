@@ -5,7 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -37,9 +36,9 @@ public class Task extends BaseEntity {
     @Column(columnDefinition = "text")
     private String error;
 
-    @OneToOne(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, optional = false)
+    @OneToOne(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true, optional = false)
     private TaskInput input;
 
-    @OneToOne(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private TaskResult result;
 }
