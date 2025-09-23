@@ -14,6 +14,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import ru.javaboys.vibe_data.domain.converter.TaskInputPayloadJsonConverter;
 import ru.javaboys.vibe_data.domain.jsonb.TaskInputPayload;
 
@@ -33,6 +35,7 @@ public class TaskInput extends BaseEntity {
 
     @Valid
     @Convert(converter = TaskInputPayloadJsonConverter.class)
+    @JdbcTypeCode(SqlTypes.OTHER)
     @Column(columnDefinition = "jsonb", nullable = false)
     private TaskInputPayload payload;
 }

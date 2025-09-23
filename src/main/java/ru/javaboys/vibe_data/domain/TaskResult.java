@@ -14,6 +14,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import ru.javaboys.vibe_data.domain.converter.RewrittenQueryListJsonConverter;
 import ru.javaboys.vibe_data.domain.converter.SqlBlockListJsonConverter;
 import ru.javaboys.vibe_data.domain.jsonb.RewrittenQuery;
@@ -37,16 +39,19 @@ public class TaskResult extends BaseEntity {
 
     @Valid
     @Convert(converter = SqlBlockListJsonConverter.class)
+    @JdbcTypeCode(SqlTypes.OTHER)
     @Column(columnDefinition = "jsonb", nullable = false)
     private List<SqlBlock> ddl;
 
     @Valid
     @Convert(converter = SqlBlockListJsonConverter.class)
+    @JdbcTypeCode(SqlTypes.OTHER)
     @Column(columnDefinition = "jsonb", nullable = false)
     private List<SqlBlock> migrations;
 
     @Valid
     @Convert(converter = RewrittenQueryListJsonConverter.class)
+    @JdbcTypeCode(SqlTypes.OTHER)
     @Column(columnDefinition = "jsonb", nullable = false)
     private List<RewrittenQuery> queries;
 }
