@@ -1,10 +1,9 @@
 package ru.javaboys.vibe_data.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.server.ResponseStatusException;
 import ru.javaboys.vibe_data.api.dto.NewTaskRequestDto;
 import ru.javaboys.vibe_data.api.dto.ResultResponseDto;
@@ -12,6 +11,7 @@ import ru.javaboys.vibe_data.domain.Task;
 import ru.javaboys.vibe_data.domain.TaskInput;
 import ru.javaboys.vibe_data.domain.TaskResult;
 import ru.javaboys.vibe_data.domain.TaskStatus;
+import ru.javaboys.vibe_data.event.TaskCreatedEvent;
 import ru.javaboys.vibe_data.mapper.TaskInputPayloadMapper;
 import ru.javaboys.vibe_data.mapper.TaskResultMapper;
 import ru.javaboys.vibe_data.repository.TaskRepository;
@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+
 @Service
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
@@ -27,17 +28,15 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final TaskInputPayloadMapper taskInputPayloadMapper;
     private final TaskResultMapper taskResultMapper;
-    private final TaskProcessor taskProcessor;
+    private final ApplicationEventPublisher events;
 
     @Override
     @Transactional
     public UUID createTask(NewTaskRequestDto request) {
-        // Create task with RUNNING status
         Task task = Task.builder()
                 .status(TaskStatus.RUNNING)
                 .build();
 
-        // Map request dto to payload and bind to task input
         TaskInput input = TaskInput.builder()
                 .task(task)
                 .payload(taskInputPayloadMapper.toPayload(request))
@@ -47,17 +46,7 @@ public class TaskServiceImpl implements TaskService {
 
         Task saved = taskRepository.save(task);
 
-        // Запускаем асинхронную обработку после коммита транзакции
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCommit() {
-                    taskProcessor.processTaskAsync(saved.getId());
-                }
-            });
-        } else {
-            taskProcessor.processTaskAsync(saved.getId());
-        }
+        events.publishEvent(new TaskCreatedEvent(saved.getId()));
 
         return saved.getId();
     }

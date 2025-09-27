@@ -2,7 +2,6 @@ package ru.javaboys.vibe_data.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javaboys.vibe_data.agent.QueryOptimizerAgent;
@@ -21,9 +20,8 @@ public class TaskProcessor {
     private final TaskRepository taskRepository;
     private final QueryOptimizerAgent optimizerAgent;
 
-    @Async("taskExecutor")
     @Transactional
-    public void processTaskAsync(UUID taskId) {
+    public void processTask(UUID taskId) {
         Task task = taskRepository.findById(taskId).orElse(null);
         if (task == null) {
             log.warn("Task {} not found for processing", taskId);

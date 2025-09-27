@@ -4,6 +4,7 @@ package ru.javaboys.vibe_data.agent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.javaboys.vibe_data.agent.tools.TrinoPlanTools;
 import ru.javaboys.vibe_data.domain.Task;
 import ru.javaboys.vibe_data.domain.TaskResult;
 import ru.javaboys.vibe_data.domain.jsonb.DdlStatement;
@@ -12,7 +13,6 @@ import ru.javaboys.vibe_data.domain.jsonb.RewrittenQuery;
 import ru.javaboys.vibe_data.domain.jsonb.SqlBlock;
 import ru.javaboys.vibe_data.llm.LlmRequest;
 import ru.javaboys.vibe_data.llm.LlmService;
-import ru.javaboys.vibe_data.tools.TrinoPlanTools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,14 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Основной оркестратор шага оптимизации:
- *  - готовит системный промпт
- *  - сортирует запросы по весу (runquantity * executiontime)
- *  - итеративно оптимизирует каждый запрос, сохраняя queryid
- *  - агрегирует DDL-изменения
- *  - генерирует миграции
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
