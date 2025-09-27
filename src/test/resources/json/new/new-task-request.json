@@ -1,9 +1,0 @@
-{
-  "url": "https://example.com/dataset.csv",
-  "ddl": [
-    { "statement": "CREATE TABLE IF NOT EXISTS t (id INT);" }
-  ],
-  "queries": [
-    { "queryid": "q1", "query": "SELECT 1", "runquantity": 1 }
-  ]
-}

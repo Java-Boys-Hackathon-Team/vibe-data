@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
-import ru.javaboys.vibe_data.llm.TrinoExplainType;
-import ru.javaboys.vibe_data.service.TrinoMetricToolService;
 
 /**
  * Набор инструментов, доступных LLM через Tool Calling (Spring AI Function Calling).
