@@ -10,9 +10,12 @@ import java.util.Map;
 @Builder
 public class LlmRequest {
     private String conversationId;
+
     private String systemMessage;
     private Map<String, Object> systemVariables;
+
     private String userMessage;
     private Map<String, Object> userVariables;
+
     private List<Object> tools;
 }
