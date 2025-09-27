@@ -12,10 +12,10 @@ public final class PromptTemplates {
             Follow the rules strictly and prefer measurable improvements.
             
             Rules:
-            {{rules}}
+            {rules}
             
             Project constraints (RU):
-            {{catalogSchemaRule}}
+            {catalogSchemaRule}
             """;
 
     public static final String RULES = """
@@ -37,10 +37,10 @@ public final class PromptTemplates {
     public static final String QUERY_OPTIMIZATION_PROMPT = """
             Контекст:
             - Исходный DDL (все таблицы):
-            {{original_ddl}}
+            {original_ddl}
             
             - Уже накопленные изменения DDL на предыдущих шагах:
-            {{accumulated_ddl}}
+            {accumulated_ddl}
             
             Задача (итерация):
             Перед тобой один SQL-запрос (Trino), который часто выполняется и затратен.
@@ -52,20 +52,20 @@ public final class PromptTemplates {
             5) Учитывать уже накопленные изменения DDL из предыдущих шагов (их можно дополнять).
             
             Метаданные:
-            - queryid: {{queryid}}
-            - runquantity: {{runquantity}}
-            - executiontime: {{executiontime}}
+            - queryid: {queryid}
+            - runquantity: {runquantity}
+            - executiontime: {executiontime}
             
             SQL:
-            {{query_sql}}
+            {query_sql}
             
             Ожидаемый строго-структурированный JSON-ответ (без лишних полей) под Java-класс:
-            PerQueryOptimizationOutput {
+            PerQueryOptimizationOutput<
               String queryid;              // тот же, что во входе
               String rewrittenQuery;       // новая версия SQL (Trino)
               List<String> ddlChanges;     // ноль или больше DDL-операторов (CREATE SCHEMA/TABLE/… с полными именами)
               String reasoning;            // краткие причины изменений (до 10 строк)
-            }
+            >
             Важно:
             - Полные имена таблиц в DDL и в запросе.
             - Не добавляй комментарии вне JSON.
@@ -75,10 +75,10 @@ public final class PromptTemplates {
             Финальная задача:
             На основе:
             - Исходного DDL:
-            {{original_ddl}}
+            {original_ddl}
             
             - Оптимизированного DDL (накопленного):
-            {{optimized_ddl}}
+            {optimized_ddl}
             
             Сгенерируй:
             1) Итоговый набор DDL для новой структуры (перечисление SQL операторов). Первая команда обязательно — CREATE SCHEMA <каталог>.<новая_схема>.
@@ -86,9 +86,9 @@ public final class PromptTemplates {
             3) Никаких комментариев, только данные.
             
             Строго выдай JSON под Java-класс:
-            FinalMigrationOutput {
+            FinalMigrationOutput<
               List<String> newDdl;      // полный список DDL; первая команда — CREATE SCHEMA ...
               List<String> migrations;  // список INSERT ... SELECT ... с полными именами
-            }
+            >
             """;
 }

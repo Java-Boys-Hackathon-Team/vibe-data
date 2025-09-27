@@ -82,7 +82,7 @@ public class LlmServiceImpl implements LlmService {
 
         List<Object> tools = request.getTools();
         if (tools != null && !tools.isEmpty()) {
-            chatClientRequestSpec = chatClientRequestSpec.tools(tools);
+            chatClientRequestSpec = chatClientRequestSpec.tools(tools.toArray());
         }
 
         return chatClientRequestSpec;

@@ -1,8 +1,10 @@
 package ru.javaboys.vibe_data.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.server.ResponseStatusException;
 import ru.javaboys.vibe_data.api.dto.NewTaskRequestDto;
 import ru.javaboys.vibe_data.api.dto.ResultResponseDto;
@@ -45,8 +47,17 @@ public class TaskServiceImpl implements TaskService {
 
         Task saved = taskRepository.save(task);
 
-        // Запускаем асинхронную обработку
-        taskProcessor.processTaskAsync(saved.getId());
+        // Запускаем асинхронную обработку после коммита транзакции
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    taskProcessor.processTaskAsync(saved.getId());
+                }
+            });
+        } else {
+            taskProcessor.processTaskAsync(saved.getId());
+        }
 
         return saved.getId();
     }
