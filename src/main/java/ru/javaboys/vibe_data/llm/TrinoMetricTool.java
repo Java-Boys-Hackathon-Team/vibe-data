@@ -1,16 +1,14 @@
 package ru.javaboys.vibe_data.llm;
 
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.ai.tool.annotation.ToolParam;
 import ru.javaboys.vibe_data.service.TrinoMetricToolService;
 
 @RequiredArgsConstructor
 public class TrinoMetricTool {
     private final TrinoMetricToolService service;
 
-    @Tool
+//    @Tool
     public String requestAnalyzeInJson(
             @ToolParam(description = "Sql script") String sql,
             @ToolParam(description = "Explain type") TrinoExplainType type
