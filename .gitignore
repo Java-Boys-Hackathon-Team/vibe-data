@@ -214,6 +214,9 @@ ehthumbs_vista.db
 # Dump file
 *.stackdump
 
+# Source code text files
+**/source-code-*.txt
+
 # Folder config file
 [Dd]esktop.ini
 
