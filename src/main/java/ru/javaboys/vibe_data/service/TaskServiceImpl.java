@@ -25,6 +25,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final TaskInputPayloadMapper taskInputPayloadMapper;
     private final TaskResultMapper taskResultMapper;
+    private final TaskProcessor taskProcessor;
 
     @Override
     @Transactional
@@ -43,6 +44,10 @@ public class TaskServiceImpl implements TaskService {
         task.setInput(input);
 
         Task saved = taskRepository.save(task);
+
+        // Запускаем асинхронную обработку
+        taskProcessor.processTaskAsync(saved.getId());
+
         return saved.getId();
     }
 

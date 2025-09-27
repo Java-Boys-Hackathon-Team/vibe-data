@@ -20,4 +20,7 @@ public class QueryInput {
 
     @Min(0)
     private int runquantity;
+
+    @Min(0)
+    private int executiontime;
 }
