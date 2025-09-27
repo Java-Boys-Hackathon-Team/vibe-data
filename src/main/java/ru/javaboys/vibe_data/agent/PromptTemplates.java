@@ -7,24 +7,25 @@ public final class PromptTemplates {
     }
 
     public static final String SYSTEM_ROLE = """
-            You are a senior Trino + Iceberg performance engineer and SQL query/DDL optimizer.
-            You must produce **valid Trino SQL** and **Iceberg-friendly DDL** only.
-            Follow the rules strictly and prefer measurable improvements.
+            Вы — опытный инженер по производительности Trino + Iceberg и оптимизатор SQL-запросов/DDL.
+            Вы должны выдавать валидный SQL для Trino и DDL, совместимый с Iceberg.
+            Строго следуйте правилам и отдавайте предпочтение улучшениям, дающим измеримый эффект.
             
-            Rules:
+            Правила:
             {rules}
             
-            Project constraints (RU):
+            Ограничения проекта:
             {catalogSchemaRule}
             """;
 
+
     public static final String RULES = """
-            - Work for Trino with Iceberg connector only (read-only cluster for analysis, but DDL must be valid Iceberg).
-            - Prefer: partitioning, ordering, z-ordering, data-type fixes, column pruning, predicate pushdown, join reordering, CTE materialization via temp tables (if applicable), denormalization when star/snowflake patterns appear.
-            - Always use **fully qualified names**: <catalog>.<schema>.<table>.
-            - Do not break semantics of queries.
-            - Keep original queryid for rewritten queries.
-            - When proposing DDL, ensure it is idempotent-safe when possible (use CREATE SCHEMA if not exists / CREATE TABLE if not exists if allowed, or document assumptions).
+            - Работайте только для Trino с коннектором Iceberg, DDL должен быть валиден для Iceberg.
+            - Предпочитайте: партиционирование, ordering, z-ordering, исправление типов данных, устранение лишних колонок, predicate pushdown, join reordering, материализацию CTE через временные таблицы (если применимо), денормализацию при наличии звёздной/снежинки схемы.
+            - Всегда используйте полные имена: <каталог>.<схема>.<таблица>.
+            - Не нарушайте семантику запросов.
+            - Сохраняйте исходный queryid у переписанных запросов.
+            - При предложении DDL по возможности делайте их идемпотентными (используйте CREATE SCHEMA IF NOT EXISTS / CREATE TABLE IF NOT EXISTS, если допустимо, либо явно описывайте предположения).
             """;
 
     public static final String CATALOG_SCHEMA_RULE = """
@@ -43,11 +44,11 @@ public final class PromptTemplates {
             {accumulated_ddl}
             
             Задача (итерация):
-            Перед тобой один SQL-запрос (Trino), который часто выполняется и затратен.
+            Перед тобой один SQL-запрос (Trino/Iceberg), который часто выполняется и затратен.
             Тебе нужно:
             1) Проанализировать план (разрешено вызывать инструменты EXPLAIN/ANALYZE).
             2) Предложить ПЕРЕПИСАННУЮ версию запроса для улучшения производительности.
-            3) При необходимости — предложить изменения DDL (например: новую денормализованную таблицу, партиционирование, сортировку, материализацию и т.д.) с полными именами.
+            3) При необходимости — предложить изменения DDL с полными именами.
             4) Сохранить идентификатор запроса.
             5) Учитывать уже накопленные изменения DDL из предыдущих шагов (их можно дополнять).
             
@@ -59,16 +60,9 @@ public final class PromptTemplates {
             SQL:
             {query_sql}
             
-            Ожидаемый строго-структурированный JSON-ответ (без лишних полей) под Java-класс:
-            PerQueryOptimizationOutput<
-              String queryid;              // тот же, что во входе
-              String rewrittenQuery;       // новая версия SQL (Trino)
-              List<String> ddlChanges;     // ноль или больше DDL-операторов (CREATE SCHEMA/TABLE/… с полными именами)
-              String reasoning;            // краткие причины изменений (до 10 строк)
-            >
             Важно:
             - Полные имена таблиц в DDL и в запросе.
-            - Не добавляй комментарии вне JSON.
+            - Не нарушай семантику запроса.
             """;
 
     public static final String MIGRATION_SYNTHESIS_PROMPT = """
@@ -84,11 +78,5 @@ public final class PromptTemplates {
             1) Итоговый набор DDL для новой структуры (перечисление SQL операторов). Первая команда обязательно — CREATE SCHEMA <каталог>.<новая_схема>.
             2) Набор SQL миграций INSERT ... SELECT ... для переноса данных из старой структуры в новую. Везде полные имена.
             3) Никаких комментариев, только данные.
-            
-            Строго выдай JSON под Java-класс:
-            FinalMigrationOutput<
-              List<String> newDdl;      // полный список DDL; первая команда — CREATE SCHEMA ...
-              List<String> migrations;  // список INSERT ... SELECT ... с полными именами
-            >
             """;
 }
