@@ -1,0 +1,193 @@
+Trino version: 468
+Queued: 196.29us, Analysis: 83.59ms, Planning: 100.40ms, Execution: 33.33s
+Fragment 1 [ROUND_ROBIN]
+CPU: 18.31ms, Scheduled: 28.07ms, Blocked 34.58m (Input: 33.54m, Output: 0.00ns), Input: 240 rows (24.38kB); per task: avg.: 120.00 std.dev.: 42.00, Output: 240 rows (24.38kB)
+Peak Memory: 29.38kB, Tasks count: 2; per task: max: 19.79kB
+Amount of input data processed by the workers for this stage might be skewed
+Output layout: [month, origin, expr_64_gid, count_68, sum, expr_72, expr_73, expr_74, expr_75, expr_76, expr_77]
+Output partitioning: SINGLE []
+LocalMerge[orderBy = [month DESC NULLS LAST, origin ASC NULLS LAST, expr_64_gid ASC NULLS LAST]]
+│   Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_68:bigint, sum:bigint, expr_72:double, expr_73:double, expr_74:double, expr_75:double, expr_76:double, expr_77:decimal(24,1)]
+│   Estimates: {rows: ? (?), cpu: 0, memory: 0B, network: 0B}
+│   CPU: 3.00ms (0.00%), Scheduled: 3.00ms (0.00%), Blocked: 1.03m (0.54%), Output: 240 rows (24.38kB)
+│   Input avg.: 3.75 rows, Input std.dev.: 345.51%
+└─ PartialSort[orderBy = [month DESC NULLS LAST, origin ASC NULLS LAST, expr_64_gid ASC NULLS LAST]]
+│   Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_68:bigint, sum:bigint, expr_72:double, expr_73:double, expr_74:double, expr_75:double, expr_76:double, expr_77:decimal(24,1)]
+│   CPU: 10.00ms (0.01%), Scheduled: 19.00ms (0.01%), Blocked: 0.00ns (0.00%), Output: 240 rows (24.38kB)
+│   Input avg.: 3.75 rows, Input std.dev.: 345.51%
+└─ RemoteSource[sourceFragmentIds = [2]]
+Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_68:bigint, sum:bigint, expr_72:double, expr_73:double, expr_74:double, expr_75:double, expr_76:double, expr_77:decimal(24,1)]
+CPU: 2.00ms (0.00%), Scheduled: 2.00ms (0.00%), Blocked: 33.54m (17.50%), Output: 240 rows (24.38kB)
+Input avg.: 3.75 rows, Input std.dev.: 345.51%
+
+Fragment 2 [HASH]
+CPU: 113.90ms, Scheduled: 152.67ms, Blocked 1.14h (Input: 34.44m, Output: 0.00ns), Input: 7678 rows (1.53MB); per task: avg.: 3839.00 std.dev.: 129.00, Output: 240 rows (24.38kB)
+Peak Memory: 7.50kB, Tasks count: 2; per task: max: 5.52kB
+Output layout: [month, origin, expr_64_gid, count_68, sum, expr_72, expr_73, expr_74, expr_75, expr_76, expr_77]
+Output partitioning: ROUND_ROBIN []
+Project[]
+│   Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_68:bigint, sum:bigint, expr_72:double, expr_73:double, expr_74:double, expr_75:double, expr_76:double, expr_77:decimal(24,1)]
+│   Estimates: {rows: ? (?), cpu: ?, memory: 0B, network: 0B}
+│   CPU: 24.00ms (0.02%), Scheduled: 34.00ms (0.01%), Blocked: 0.00ns (0.00%), Output: 240 rows (24.38kB)
+│   Input avg.: 3.75 rows, Input std.dev.: 51.64%
+│   expr_72 := round(avg, integer '2')
+│   expr_73 := round(avg_69, integer '2')
+│   expr_74 := round(avg_70, integer '2')
+│   expr_75 := round(corr, integer '2')
+│   expr_76 := round(corr_71, integer '2')
+│   expr_77 := round($operator$divide($operator$multiply(CAST(sum AS decimal(19,0)), decimal(4,1) '100.0'), CAST(count_68 AS decimal(19,0))), integer '2')
+└─ Aggregate[type = FINAL, keys = [month, origin, expr_64_gid]]
+│   Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_68:bigint, avg:double, avg_69:double, avg_70:double, corr:double, corr_71:double, sum:bigint]
+│   Estimates: {rows: ? (?), cpu: ?, memory: ?, network: 0B}
+│   CPU: 59.00ms (0.04%), Scheduled: 83.00ms (0.03%), Blocked: 0.00ns (0.00%), Output: 240 rows (20.39kB)
+│   Input avg.: 119.97 rows, Input std.dev.: 51.66%
+│   count_68 := count(count_78)
+│   avg := avg(avg_79)
+│   avg_69 := avg(avg_80)
+│   avg_70 := avg(avg_81)
+│   corr := corr(corr_82)
+│   corr_71 := corr(corr_83)
+│   sum := sum(sum_84)
+└─ LocalExchange[partitioning = HASH, arguments = [month::integer, origin::varchar, expr_64_gid::varchar(8)]]
+│   Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_78:bigint, avg_79:row(double, bigint), avg_80:row(double, bigint), avg_81:row(double, bigint), corr_82:row(double, bigint, double, double, double, double), corr_83:row(double, bigint, double, double, double, double), sum_84:bigint]
+│   Estimates: {rows: ? (?), cpu: ?, memory: 0B, network: 0B}
+│   CPU: 25.00ms (0.02%), Scheduled: 30.00ms (0.01%), Blocked: 34.02m (17.75%), Output: 7678 rows (1.53MB)
+│   Input avg.: 119.97 rows, Input std.dev.: 298.87%
+└─ RemoteSource[sourceFragmentIds = [3]]
+Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_78:bigint, avg_79:row(double, bigint), avg_80:row(double, bigint), avg_81:row(double, bigint), corr_82:row(double, bigint, double, double, double, double), corr_83:row(double, bigint, double, double, double, double), sum_84:bigint]
+CPU: 3.00ms (0.00%), Scheduled: 3.00ms (0.00%), Blocked: 34.44m (17.97%), Output: 7678 rows (1.53MB)
+Input avg.: 119.97 rows, Input std.dev.: 298.87%
+
+Fragment 3 [HASH]
+CPU: 1.04m, Scheduled: 1.89m, Blocked 1.16h (Input: 19.33m, Output: 0.00ns), Input: 108964062 rows (7.31GB); per task: avg.: 54482031.00 std.dev.: 19161157.00, Output: 7678 rows (1.68MB)
+Peak Memory: 167.80MB, Tasks count: 2; per task: max: 92.70MB
+Amount of input data processed by the workers for this stage might be skewed
+Output layout: [month, origin, expr_64_gid, count_78, avg_79, avg_80, avg_81, corr_82, corr_83, sum_84]
+Output partitioning: HASH [month, origin, expr_64_gid]
+Aggregate[type = PARTIAL, keys = [month, origin, expr_64_gid]]
+│   Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_78:bigint, avg_79:row(double, bigint), avg_80:row(double, bigint), avg_81:row(double, bigint), corr_82:row(double, bigint, double, double, double, double), corr_83:row(double, bigint, double, double, double, double), sum_84:bigint]
+│   CPU: 23.36s (17.04%), Scheduled: 42.32s (13.58%), Blocked: 0.00ns (0.00%), Output: 7678 rows (1.68MB)
+│   Input avg.: 1160808.13 rows, Input std.dev.: 64.40%
+│   count_78 := count(*)
+│   avg_79 := avg(taxiout)
+│   avg_80 := avg(depdelay)
+│   avg_81 := avg(arrdelay)
+│   corr_82 := corr(taxiout, depdelay)
+│   corr_83 := corr(taxiout, arrdelay)
+│   sum_84 := sum(expr_66)
+└─ Project[]
+│   Layout: [depdelay:double, taxiout:double, arrdelay:double, expr_66:bigint, month:integer, origin:varchar, expr_64_gid:varchar(8)]
+│   Estimates: {rows: ? (?), cpu: ?, memory: 0B, network: 0B}
+│   CPU: 11.81s (8.62%), Scheduled: 20.76s (6.66%), Blocked: 0.00ns (0.00%), Output: 74291720 rows (5.58GB)
+│   Input avg.: 1160808.13 rows, Input std.dev.: 64.40%
+│   expr_66 := CAST((CASE WHEN (depdel15 = double '1.0') THEN integer '1' ELSE integer '0' END) AS bigint)
+│   expr_64_gid := (CASE WHEN (deptimeblk IN (varchar '0600-0659', varchar '0700-0759', varchar '0800-0859', varchar '1600-1659', varchar '1700-1759', varchar '1800-1859')) THEN varchar(8) 'Peak' ELSE varchar(8) 'Off-Peak' END)
+└─ InnerJoin[criteria = (origin = origin_2) AND (expr_63 = gid), distribution = PARTITIONED]
+│   Layout: [origin:varchar, depdelay:double, month:integer, depdel15:double, deptimeblk:varchar, taxiout:double, arrdelay:double]
+│   Estimates: {rows: ? (?), cpu: ?, memory: ?, network: 0B}
+│   CPU: 20.87s (15.22%), Scheduled: 37.88s (12.15%), Blocked: 30.34m (15.83%), Output: 74291720 rows (6.29GB)
+│   Left (probe) Input avg.: 1702492.59 rows, Input std.dev.: 64.82%
+│   Right (build) Input avg.: 1.88 rows, Input std.dev.: 66.33%
+│   Distribution: PARTITIONED
+│   dynamicFilterAssignments = {origin_2 -> #df_1135}
+├─ RemoteSource[sourceFragmentIds = [4]]
+│      Layout: [origin:varchar, depdelay:double, month:integer, depdel15:double, deptimeblk:varchar, taxiout:double, arrdelay:double, expr_63:bigint]
+│      CPU: 6.11s (4.46%), Scheduled: 12.24s (3.93%), Blocked: 10.14m (5.29%), Output: 108959526 rows (7.31GB)
+│      Input avg.: 1702492.59 rows, Input std.dev.: 64.82%
+└─ LocalExchange[partitioning = HASH, arguments = [origin_2::varchar, gid::bigint]]
+│   Layout: [origin_2:varchar, gid:bigint]
+│   Estimates: {rows: ? (?), cpu: ?, memory: 0B, network: 0B}
+│   CPU: 2.00ms (0.00%), Scheduled: 6.00ms (0.00%), Blocked: 8.77m (4.58%), Output: 120 rows (1.99kB)
+│   Input avg.: 1.88 rows, Input std.dev.: 208.17%
+└─ Project[]
+│   Layout: [origin_2:varchar, gid:bigint]
+│   Estimates: {rows: ? (?), cpu: ?, memory: 0B, network: 0B}
+│   CPU: 3.00ms (0.00%), Scheduled: 4.00ms (0.00%), Blocked: 0.00ns (0.00%), Output: 120 rows (1.99kB)
+│   Input avg.: 1.88 rows, Input std.dev.: 208.17%
+└─ TopNRanking[partitionBy = [gid], orderBy = [count DESC NULLS LAST], limit = 10]
+│   Layout: [origin_2:varchar, gid:bigint, count:bigint, rank:bigint]
+│   CPU: 22.00ms (0.02%), Scheduled: 28.00ms (0.01%), Blocked: 0.00ns (0.00%), Output: 120 rows (4.10kB)
+│   Input avg.: 70.88 rows, Input std.dev.: 208.18%
+│   rank := RANK
+└─ LocalExchange[partitioning = HASH, arguments = [gid::bigint]]
+│   Layout: [origin_2:varchar, gid:bigint, count:bigint]
+│   Estimates: {rows: ? (?), cpu: ?, memory: 0B, network: 0B}
+│   CPU: 7.00ms (0.01%), Scheduled: 8.00ms (0.00%), Blocked: 8.18m (4.27%), Output: 4536 rows (115.17kB)
+│   Input avg.: 70.88 rows, Input std.dev.: 317.98%
+└─ RemoteSource[sourceFragmentIds = [5]]
+Layout: [origin_2:varchar, gid:bigint, count:bigint]
+CPU: 2.00ms (0.00%), Scheduled: 2.00ms (0.00%), Blocked: 9.19m (4.79%), Output: 4536 rows (115.17kB)
+Input avg.: 70.88 rows, Input std.dev.: 317.98%
+
+Fragment 4 [SOURCE]
+CPU: 39.62s, Scheduled: 2.29m, Blocked 2.87m (Input: 0.00ns, Output: 2.87m), Input: 233550256 rows (12.48GB); per task: avg.: 116775128.00 std.dev.: 444344.00, Output: 108959526 rows (5.44GB)
+Peak Memory: 341.60MB, Tasks count: 2; per task: max: 177.46MB
+Output layout: [origin, depdelay, month, depdel15, deptimeblk, taxiout, arrdelay, expr_63]
+Output partitioning: HASH [expr_63]
+ScanFilterProject[table = flights:public.flights$data@9119431624673072209, filterPredicate = ((cancelled = boolean 'false') AND (diverted = boolean 'false')), dynamicFilters = {origin = #df_1135}]
+Layout: [origin:varchar, depdelay:double, month:integer, depdel15:double, deptimeblk:varchar, taxiout:double, arrdelay:double, expr_63:bigint]
+Estimates: {rows: 233550256 (13.56GB), cpu: 13.56G, memory: 0B, network: 0B}/{rows: 210195230 (12.20GB), cpu: 13.56G, memory: 0B, network: 0B}/{rows: 210195230 (12.20GB), cpu: 12.20G, memory: 0B, network: 0B}
+CPU: 39.60s (28.88%), Scheduled: 2.29m (43.98%), Blocked: 2.87m (1.50%), Output: 108959526 rows (5.44GB)
+Input avg.: 2813858.51 rows, Input std.dev.: 30.53%
+expr_63 := month(flightdate)
+flightdate := 1:flightdate:date
+depdelay := 10:depdelay:double
+deptimeblk := 50:deptimeblk:varchar
+taxiout := 51:taxiout:double
+cancelled := 5:cancelled:boolean
+origin := 3:origin:varchar
+depdel15 := 48:depdel15:double
+month := 19:month:integer
+arrdelay := 56:arrdelay:double
+diverted := 6:diverted:boolean
+Input: 233550256 rows (12.48GB), Filtered: 53.35%, Physical input: 1.09GB, Physical input time: 1.16m
+Dynamic filters:
+- df_1135, [ SortedRangeSet[type=varchar, ranges=11, {[ATL], ..., [SEA]}] ], collection time=9.43s
+
+Fragment 5 [HASH]
+CPU: 212.84ms, Scheduled: 256.08ms, Blocked 19.16m (Input: 9.22m, Output: 0.00ns), Input: 357649 rows (8.87MB); per task: avg.: 178824.50 std.dev.: 250.50, Output: 4536 rows (115.17kB)
+Peak Memory: 48.70MB, Tasks count: 2; per task: max: 24.38MB
+Output layout: [origin_2, gid, count]
+Output partitioning: HASH [gid]
+TopNRanking[partitionBy = [gid], orderBy = [count DESC NULLS LAST], limit = 10]
+│   Layout: [origin_2:varchar, gid:bigint, count:bigint]
+│   CPU: 53.00ms (0.04%), Scheduled: 74.00ms (0.02%), Blocked: 0.00ns (0.00%), Output: 4536 rows (115.17kB)
+│   Input avg.: 71.83 rows, Input std.dev.: 10.36%
+│   rank := RANK
+└─ Aggregate[type = FINAL, keys = [origin_2, gid]]
+│   Layout: [origin_2:varchar, gid:bigint, count:bigint]
+│   Estimates: {rows: ? (?), cpu: 5.40G, memory: ?, network: 0B}
+│   CPU: 88.00ms (0.06%), Scheduled: 102.00ms (0.03%), Blocked: 0.00ns (0.00%), Output: 4597 rows (116.72kB)
+│   Input avg.: 5588.27 rows, Input std.dev.: 10.57%
+│   count := count(count_85)
+└─ LocalExchange[partitioning = HASH, arguments = [origin_2::varchar, gid::bigint]]
+│   Layout: [origin_2:varchar, gid:bigint, count_85:bigint]
+│   Estimates: {rows: 233550256 (5.40GB), cpu: 5.40G, memory: 0B, network: 0B}
+│   CPU: 61.00ms (0.04%), Scheduled: 69.00ms (0.02%), Blocked: 9.95m (5.19%), Output: 357649 rows (8.87MB)
+│   Input avg.: 5588.27 rows, Input std.dev.: 122.36%
+└─ RemoteSource[sourceFragmentIds = [6]]
+Layout: [origin_2:varchar, gid:bigint, count_85:bigint]
+CPU: 4.00ms (0.00%), Scheduled: 4.00ms (0.00%), Blocked: 9.22m (4.81%), Output: 357649 rows (8.87MB)
+Input avg.: 5588.27 rows, Input std.dev.: 122.36%
+
+Fragment 6 [SOURCE]
+CPU: 34.98s, Scheduled: 1.02m, Blocked 0.00ns (Input: 0.00ns, Output: 0.00ns), Input: 233550256 rows (1.81GB); per task: avg.: 116775128.00 std.dev.: 510707.00, Output: 357649 rows (8.87MB)
+Peak Memory: 62.86MB, Tasks count: 2; per task: max: 36.18MB
+Output layout: [origin_2, gid, count_85]
+Output partitioning: HASH [origin_2, gid]
+Aggregate[type = PARTIAL, keys = [origin_2, gid]]
+│   Layout: [origin_2:varchar, gid:bigint, count_85:bigint]
+│   Estimates: {rows: 233550256 (5.40GB), cpu: ?, memory: ?, network: ?}
+│   CPU: 28.27s (20.62%), Scheduled: 33.90s (10.87%), Blocked: 0.00ns (0.00%), Output: 357649 rows (8.87MB)
+│   Input avg.: 2813858.51 rows, Input std.dev.: 30.53%
+│   count_85 := count(*)
+└─ ScanProject[table = flights:public.flights$data@9119431624673072209]
+Layout: [origin_2:varchar, gid:bigint]
+Estimates: {rows: 233550256 (3.44GB), cpu: 2.57G, memory: 0B, network: 0B}/{rows: 233550256 (3.44GB), cpu: 3.44G, memory: 0B, network: 0B}
+CPU: 6.71s (4.89%), Scheduled: 27.05s (8.68%), Blocked: 0.00ns (0.00%), Output: 233550256 rows (1.83GB)
+Input avg.: 2813858.51 rows, Input std.dev.: 30.53%
+gid := month(flightdate_0)
+flightdate_0 := 1:flightdate:date
+origin_2 := 3:origin:varchar
+Input: 233550256 rows (1.81GB), Filtered: 0.00%, Physical input: 263.20MB, Physical input time: 20.82s
+

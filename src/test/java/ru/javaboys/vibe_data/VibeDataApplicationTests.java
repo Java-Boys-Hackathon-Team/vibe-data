@@ -3,6 +3,7 @@ package ru.javaboys.vibe_data;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestExecutionListeners;
+
 import ru.javaboys.utils.DotenvTestExecutionListener;
 
 @SpringBootTest
@@ -12,8 +13,8 @@ import ru.javaboys.utils.DotenvTestExecutionListener;
 )
 class VibeDataApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }

@@ -1,0 +1,892 @@
+{
+    "0" : {
+        "id" : "43",
+        "name" : "Output",
+        "descriptor" : {
+            "columnNames" : "[Month, Origin, TimeOfDay, TotalFlights, AvgTaxiOut, AvgDEPDelay, AvgARRDelay, TaxiOut_DepDelay_Correlation, TaxiOut_ArrDelay_Correlation, DelayedFlights, PercentDelayed]"
+        },
+        "outputs" : [ {
+            "type" : "integer",
+            "name" : "month"
+        }, {
+            "type" : "varchar",
+            "name" : "origin"
+        }, {
+            "type" : "varchar(8)",
+            "name" : "expr_64_gid"
+        }, {
+            "type" : "bigint",
+            "name" : "count_68"
+        }, {
+            "type" : "double",
+            "name" : "expr_72"
+        }, {
+            "type" : "double",
+            "name" : "expr_73"
+        }, {
+            "type" : "double",
+            "name" : "expr_74"
+        }, {
+            "type" : "double",
+            "name" : "expr_75"
+        }, {
+            "type" : "double",
+            "name" : "expr_76"
+        }, {
+            "type" : "bigint",
+            "name" : "sum"
+        }, {
+            "type" : "decimal(24,1)",
+            "name" : "expr_77"
+        } ],
+        "details" : [ "Month := month", "Origin := origin", "TimeOfDay := expr_64_gid", "TotalFlights := count_68", "AvgTaxiOut := expr_72", "AvgDEPDelay := expr_73", "AvgARRDelay := expr_74", "TaxiOut_DepDelay_Correlation := expr_75", "TaxiOut_ArrDelay_Correlation := expr_76", "DelayedFlights := sum", "PercentDelayed := expr_77" ],
+        "estimates" : [ {
+            "outputRowCount" : "NaN",
+            "outputSizeInBytes" : "NaN",
+            "cpuCost" : 0.0,
+            "memoryCost" : 0.0,
+            "networkCost" : 0.0
+        } ],
+        "children" : [ {
+            "id" : "998",
+            "name" : "RemoteMerge",
+            "descriptor" : {
+                "sourceFragmentIds" : "[1]"
+            },
+            "outputs" : [ {
+                "type" : "integer",
+                "name" : "month"
+            }, {
+                "type" : "varchar",
+                "name" : "origin"
+            }, {
+                "type" : "varchar(8)",
+                "name" : "expr_64_gid"
+            }, {
+                "type" : "bigint",
+                "name" : "count_68"
+            }, {
+                "type" : "bigint",
+                "name" : "sum"
+            }, {
+                "type" : "double",
+                "name" : "expr_72"
+            }, {
+                "type" : "double",
+                "name" : "expr_73"
+            }, {
+                "type" : "double",
+                "name" : "expr_74"
+            }, {
+                "type" : "double",
+                "name" : "expr_75"
+            }, {
+                "type" : "double",
+                "name" : "expr_76"
+            }, {
+                "type" : "decimal(24,1)",
+                "name" : "expr_77"
+            } ],
+            "details" : [ ],
+            "estimates" : [ ],
+            "children" : [ ]
+        } ]
+    },
+    "1" : {
+        "id" : "1183",
+        "name" : "LocalMerge",
+        "descriptor" : {
+            "orderBy" : "[month DESC NULLS LAST, origin ASC NULLS LAST, expr_64_gid ASC NULLS LAST]"
+        },
+        "outputs" : [ {
+            "type" : "integer",
+            "name" : "month"
+        }, {
+            "type" : "varchar",
+            "name" : "origin"
+        }, {
+            "type" : "varchar(8)",
+            "name" : "expr_64_gid"
+        }, {
+            "type" : "bigint",
+            "name" : "count_68"
+        }, {
+            "type" : "bigint",
+            "name" : "sum"
+        }, {
+            "type" : "double",
+            "name" : "expr_72"
+        }, {
+            "type" : "double",
+            "name" : "expr_73"
+        }, {
+            "type" : "double",
+            "name" : "expr_74"
+        }, {
+            "type" : "double",
+            "name" : "expr_75"
+        }, {
+            "type" : "double",
+            "name" : "expr_76"
+        }, {
+            "type" : "decimal(24,1)",
+            "name" : "expr_77"
+        } ],
+        "details" : [ ],
+        "estimates" : [ {
+            "outputRowCount" : "NaN",
+            "outputSizeInBytes" : "NaN",
+            "cpuCost" : 0.0,
+            "memoryCost" : 0.0,
+            "networkCost" : 0.0
+        } ],
+        "children" : [ {
+            "id" : "999",
+            "name" : "PartialSort",
+            "descriptor" : {
+                "orderBy" : "[month DESC NULLS LAST, origin ASC NULLS LAST, expr_64_gid ASC NULLS LAST]"
+            },
+            "outputs" : [ {
+                "type" : "integer",
+                "name" : "month"
+            }, {
+                "type" : "varchar",
+                "name" : "origin"
+            }, {
+                "type" : "varchar(8)",
+                "name" : "expr_64_gid"
+            }, {
+                "type" : "bigint",
+                "name" : "count_68"
+            }, {
+                "type" : "bigint",
+                "name" : "sum"
+            }, {
+                "type" : "double",
+                "name" : "expr_72"
+            }, {
+                "type" : "double",
+                "name" : "expr_73"
+            }, {
+                "type" : "double",
+                "name" : "expr_74"
+            }, {
+                "type" : "double",
+                "name" : "expr_75"
+            }, {
+                "type" : "double",
+                "name" : "expr_76"
+            }, {
+                "type" : "decimal(24,1)",
+                "name" : "expr_77"
+            } ],
+            "details" : [ ],
+            "estimates" : [ ],
+            "children" : [ {
+                "id" : "997",
+                "name" : "RemoteSource",
+                "descriptor" : {
+                    "sourceFragmentIds" : "[2]"
+                },
+                "outputs" : [ {
+                    "type" : "integer",
+                    "name" : "month"
+                }, {
+                    "type" : "varchar",
+                    "name" : "origin"
+                }, {
+                    "type" : "varchar(8)",
+                    "name" : "expr_64_gid"
+                }, {
+                    "type" : "bigint",
+                    "name" : "count_68"
+                }, {
+                    "type" : "bigint",
+                    "name" : "sum"
+                }, {
+                    "type" : "double",
+                    "name" : "expr_72"
+                }, {
+                    "type" : "double",
+                    "name" : "expr_73"
+                }, {
+                    "type" : "double",
+                    "name" : "expr_74"
+                }, {
+                    "type" : "double",
+                    "name" : "expr_75"
+                }, {
+                    "type" : "double",
+                    "name" : "expr_76"
+                }, {
+                    "type" : "decimal(24,1)",
+                    "name" : "expr_77"
+                } ],
+                "details" : [ ],
+                "estimates" : [ ],
+                "children" : [ ]
+            } ]
+        } ]
+    },
+    "2" : {
+        "id" : "185",
+        "name" : "Project",
+        "descriptor" : { },
+        "outputs" : [ {
+            "type" : "integer",
+            "name" : "month"
+        }, {
+            "type" : "varchar",
+            "name" : "origin"
+        }, {
+            "type" : "varchar(8)",
+            "name" : "expr_64_gid"
+        }, {
+            "type" : "bigint",
+            "name" : "count_68"
+        }, {
+            "type" : "bigint",
+            "name" : "sum"
+        }, {
+            "type" : "double",
+            "name" : "expr_72"
+        }, {
+            "type" : "double",
+            "name" : "expr_73"
+        }, {
+            "type" : "double",
+            "name" : "expr_74"
+        }, {
+            "type" : "double",
+            "name" : "expr_75"
+        }, {
+            "type" : "double",
+            "name" : "expr_76"
+        }, {
+            "type" : "decimal(24,1)",
+            "name" : "expr_77"
+        } ],
+        "details" : [ "expr_72 := round(avg, integer '2')", "expr_73 := round(avg_69, integer '2')", "expr_74 := round(avg_70, integer '2')", "expr_75 := round(corr, integer '2')", "expr_76 := round(corr_71, integer '2')", "expr_77 := round($operator$divide($operator$multiply(CAST(sum AS decimal(19,0)), decimal(4,1) '100.0'), CAST(count_68 AS decimal(19,0))), integer '2')" ],
+        "estimates" : [ {
+            "outputRowCount" : "NaN",
+            "outputSizeInBytes" : "NaN",
+            "cpuCost" : "NaN",
+            "memoryCost" : 0.0,
+            "networkCost" : 0.0
+        } ],
+        "children" : [ {
+            "id" : "35",
+            "name" : "Aggregate",
+            "descriptor" : {
+                "type" : "FINAL",
+                "keys" : "[month, origin, expr_64_gid]",
+                "hash" : "[]"
+            },
+            "outputs" : [ {
+                "type" : "integer",
+                "name" : "month"
+            }, {
+                "type" : "varchar",
+                "name" : "origin"
+            }, {
+                "type" : "varchar(8)",
+                "name" : "expr_64_gid"
+            }, {
+                "type" : "bigint",
+                "name" : "count_68"
+            }, {
+                "type" : "double",
+                "name" : "avg"
+            }, {
+                "type" : "double",
+                "name" : "avg_69"
+            }, {
+                "type" : "double",
+                "name" : "avg_70"
+            }, {
+                "type" : "double",
+                "name" : "corr"
+            }, {
+                "type" : "double",
+                "name" : "corr_71"
+            }, {
+                "type" : "bigint",
+                "name" : "sum"
+            } ],
+            "details" : [ "count_68 := count(count_78)", "avg := avg(avg_79)", "avg_69 := avg(avg_80)", "avg_70 := avg(avg_81)", "corr := corr(corr_82)", "corr_71 := corr(corr_83)", "sum := sum(sum_84)" ],
+            "estimates" : [ {
+                "outputRowCount" : "NaN",
+                "outputSizeInBytes" : "NaN",
+                "cpuCost" : "NaN",
+                "memoryCost" : "NaN",
+                "networkCost" : 0.0
+            } ],
+            "children" : [ {
+                "id" : "1239",
+                "name" : "LocalExchange",
+                "descriptor" : {
+                    "partitioning" : "HASH",
+                    "isReplicateNullsAndAny" : "",
+                    "hashColumn" : "[]",
+                    "arguments" : "[month::integer, origin::varchar, expr_64_gid::varchar(8)]"
+                },
+                "outputs" : [ {
+                    "type" : "integer",
+                    "name" : "month"
+                }, {
+                    "type" : "varchar",
+                    "name" : "origin"
+                }, {
+                    "type" : "varchar(8)",
+                    "name" : "expr_64_gid"
+                }, {
+                    "type" : "bigint",
+                    "name" : "count_78"
+                }, {
+                    "type" : "row(double,bigint)",
+                    "name" : "avg_79"
+                }, {
+                    "type" : "row(double,bigint)",
+                    "name" : "avg_80"
+                }, {
+                    "type" : "row(double,bigint)",
+                    "name" : "avg_81"
+                }, {
+                    "type" : "row(double,bigint,double,double,double,double)",
+                    "name" : "corr_82"
+                }, {
+                    "type" : "row(double,bigint,double,double,double,double)",
+                    "name" : "corr_83"
+                }, {
+                    "type" : "bigint",
+                    "name" : "sum_84"
+                } ],
+                "details" : [ ],
+                "estimates" : [ {
+                    "outputRowCount" : "NaN",
+                    "outputSizeInBytes" : "NaN",
+                    "cpuCost" : "NaN",
+                    "memoryCost" : 0.0,
+                    "networkCost" : 0.0
+                } ],
+                "children" : [ {
+                    "id" : "1245",
+                    "name" : "RemoteSource",
+                    "descriptor" : {
+                        "sourceFragmentIds" : "[3]"
+                    },
+                    "outputs" : [ {
+                        "type" : "integer",
+                        "name" : "month"
+                    }, {
+                        "type" : "varchar",
+                        "name" : "origin"
+                    }, {
+                        "type" : "varchar(8)",
+                        "name" : "expr_64_gid"
+                    }, {
+                        "type" : "bigint",
+                        "name" : "count_78"
+                    }, {
+                        "type" : "row(double,bigint)",
+                        "name" : "avg_79"
+                    }, {
+                        "type" : "row(double,bigint)",
+                        "name" : "avg_80"
+                    }, {
+                        "type" : "row(double,bigint)",
+                        "name" : "avg_81"
+                    }, {
+                        "type" : "row(double,bigint,double,double,double,double)",
+                        "name" : "corr_82"
+                    }, {
+                        "type" : "row(double,bigint,double,double,double,double)",
+                        "name" : "corr_83"
+                    }, {
+                        "type" : "bigint",
+                        "name" : "sum_84"
+                    } ],
+                    "details" : [ ],
+                    "estimates" : [ ],
+                    "children" : [ ]
+                } ]
+            } ]
+        } ]
+    },
+    "3" : {
+        "id" : "1243",
+        "name" : "Aggregate",
+        "descriptor" : {
+            "type" : "PARTIAL",
+            "keys" : "[month, origin, expr_64_gid]",
+            "hash" : "[]"
+        },
+        "outputs" : [ {
+            "type" : "integer",
+            "name" : "month"
+        }, {
+            "type" : "varchar",
+            "name" : "origin"
+        }, {
+            "type" : "varchar(8)",
+            "name" : "expr_64_gid"
+        }, {
+            "type" : "bigint",
+            "name" : "count_78"
+        }, {
+            "type" : "row(double,bigint)",
+            "name" : "avg_79"
+        }, {
+            "type" : "row(double,bigint)",
+            "name" : "avg_80"
+        }, {
+            "type" : "row(double,bigint)",
+            "name" : "avg_81"
+        }, {
+            "type" : "row(double,bigint,double,double,double,double)",
+            "name" : "corr_82"
+        }, {
+            "type" : "row(double,bigint,double,double,double,double)",
+            "name" : "corr_83"
+        }, {
+            "type" : "bigint",
+            "name" : "sum_84"
+        } ],
+        "details" : [ "count_78 := count(*)", "avg_79 := avg(taxiout)", "avg_80 := avg(depdelay)", "avg_81 := avg(arrdelay)", "corr_82 := corr(taxiout, depdelay)", "corr_83 := corr(taxiout, arrdelay)", "sum_84 := sum(expr_66)" ],
+        "estimates" : [ ],
+        "children" : [ {
+            "id" : "195",
+            "name" : "Project",
+            "descriptor" : { },
+            "outputs" : [ {
+                "type" : "double",
+                "name" : "depdelay"
+            }, {
+                "type" : "double",
+                "name" : "taxiout"
+            }, {
+                "type" : "double",
+                "name" : "arrdelay"
+            }, {
+                "type" : "bigint",
+                "name" : "expr_66"
+            }, {
+                "type" : "integer",
+                "name" : "month"
+            }, {
+                "type" : "varchar",
+                "name" : "origin"
+            }, {
+                "type" : "varchar(8)",
+                "name" : "expr_64_gid"
+            } ],
+            "details" : [ "expr_66 := CAST((CASE WHEN (depdel15 = double '1.0') THEN integer '1' ELSE integer '0' END) AS bigint)", "expr_64_gid := (CASE WHEN (deptimeblk IN (varchar '0600-0659', varchar '0700-0759', varchar '0800-0859', varchar '1600-1659', varchar '1700-1759', varchar '1800-1859')) THEN varchar(8) 'Peak' ELSE varchar(8) 'Off-Peak' END)" ],
+            "estimates" : [ {
+                "outputRowCount" : "NaN",
+                "outputSizeInBytes" : "NaN",
+                "cpuCost" : "NaN",
+                "memoryCost" : 0.0,
+                "networkCost" : 0.0
+            } ],
+            "children" : [ {
+                "id" : "25",
+                "name" : "InnerJoin",
+                "descriptor" : {
+                    "criteria" : "(origin = origin_2) AND (expr_63 = gid)",
+                    "hash" : "[]",
+                    "distribution" : "PARTITIONED"
+                },
+                "outputs" : [ {
+                    "type" : "varchar",
+                    "name" : "origin"
+                }, {
+                    "type" : "double",
+                    "name" : "depdelay"
+                }, {
+                    "type" : "integer",
+                    "name" : "month"
+                }, {
+                    "type" : "double",
+                    "name" : "depdel15"
+                }, {
+                    "type" : "varchar",
+                    "name" : "deptimeblk"
+                }, {
+                    "type" : "double",
+                    "name" : "taxiout"
+                }, {
+                    "type" : "double",
+                    "name" : "arrdelay"
+                } ],
+                "details" : [ "Distribution: PARTITIONED", "dynamicFilterAssignments = {origin_2 -> #df_1081}" ],
+                "estimates" : [ {
+                    "outputRowCount" : "NaN",
+                    "outputSizeInBytes" : "NaN",
+                    "cpuCost" : "NaN",
+                    "memoryCost" : "NaN",
+                    "networkCost" : 0.0
+                } ],
+                "children" : [ {
+                    "id" : "995",
+                    "name" : "RemoteSource",
+                    "descriptor" : {
+                        "sourceFragmentIds" : "[4]"
+                    },
+                    "outputs" : [ {
+                        "type" : "varchar",
+                        "name" : "origin"
+                    }, {
+                        "type" : "double",
+                        "name" : "depdelay"
+                    }, {
+                        "type" : "integer",
+                        "name" : "month"
+                    }, {
+                        "type" : "double",
+                        "name" : "depdel15"
+                    }, {
+                        "type" : "varchar",
+                        "name" : "deptimeblk"
+                    }, {
+                        "type" : "double",
+                        "name" : "taxiout"
+                    }, {
+                        "type" : "double",
+                        "name" : "arrdelay"
+                    }, {
+                        "type" : "bigint",
+                        "name" : "expr_63"
+                    } ],
+                    "details" : [ ],
+                    "estimates" : [ ],
+                    "children" : [ ]
+                }, {
+                    "id" : "1181",
+                    "name" : "LocalExchange",
+                    "descriptor" : {
+                        "partitioning" : "HASH",
+                        "isReplicateNullsAndAny" : "",
+                        "hashColumn" : "[]",
+                        "arguments" : "[origin_2::varchar, gid::bigint]"
+                    },
+                    "outputs" : [ {
+                        "type" : "varchar",
+                        "name" : "origin_2"
+                    }, {
+                        "type" : "bigint",
+                        "name" : "gid"
+                    } ],
+                    "details" : [ ],
+                    "estimates" : [ {
+                        "outputRowCount" : "NaN",
+                        "outputSizeInBytes" : "NaN",
+                        "cpuCost" : "NaN",
+                        "memoryCost" : 0.0,
+                        "networkCost" : 0.0
+                    } ],
+                    "children" : [ {
+                        "id" : "1085",
+                        "name" : "Project",
+                        "descriptor" : { },
+                        "outputs" : [ {
+                            "type" : "varchar",
+                            "name" : "origin_2"
+                        }, {
+                            "type" : "bigint",
+                            "name" : "gid"
+                        } ],
+                        "details" : [ ],
+                        "estimates" : [ {
+                            "outputRowCount" : "NaN",
+                            "outputSizeInBytes" : "NaN",
+                            "cpuCost" : "NaN",
+                            "memoryCost" : 0.0,
+                            "networkCost" : 0.0
+                        } ],
+                        "children" : [ {
+                            "id" : "15",
+                            "name" : "TopNRanking",
+                            "descriptor" : {
+                                "partitionBy" : "[gid]",
+                                "orderBy" : "[count DESC NULLS LAST]",
+                                "limit" : "10",
+                                "hash" : "[]"
+                            },
+                            "outputs" : [ {
+                                "type" : "varchar",
+                                "name" : "origin_2"
+                            }, {
+                                "type" : "bigint",
+                                "name" : "gid"
+                            }, {
+                                "type" : "bigint",
+                                "name" : "count"
+                            }, {
+                                "type" : "bigint",
+                                "name" : "rank"
+                            } ],
+                            "details" : [ "rank := RANK" ],
+                            "estimates" : [ ],
+                            "children" : [ {
+                                "id" : "1180",
+                                "name" : "LocalExchange",
+                                "descriptor" : {
+                                    "partitioning" : "HASH",
+                                    "isReplicateNullsAndAny" : "",
+                                    "hashColumn" : "[]",
+                                    "arguments" : "[gid::bigint]"
+                                },
+                                "outputs" : [ {
+                                    "type" : "varchar",
+                                    "name" : "origin_2"
+                                }, {
+                                    "type" : "bigint",
+                                    "name" : "gid"
+                                }, {
+                                    "type" : "bigint",
+                                    "name" : "count"
+                                } ],
+                                "details" : [ ],
+                                "estimates" : [ {
+                                    "outputRowCount" : "NaN",
+                                    "outputSizeInBytes" : "NaN",
+                                    "cpuCost" : "NaN",
+                                    "memoryCost" : 0.0,
+                                    "networkCost" : 0.0
+                                } ],
+                                "children" : [ {
+                                    "id" : "994",
+                                    "name" : "RemoteSource",
+                                    "descriptor" : {
+                                        "sourceFragmentIds" : "[5]"
+                                    },
+                                    "outputs" : [ {
+                                        "type" : "varchar",
+                                        "name" : "origin_2"
+                                    }, {
+                                        "type" : "bigint",
+                                        "name" : "gid"
+                                    }, {
+                                        "type" : "bigint",
+                                        "name" : "count"
+                                    } ],
+                                    "details" : [ ],
+                                    "estimates" : [ ],
+                                    "children" : [ ]
+                                } ]
+                            } ]
+                        } ]
+                    } ]
+                } ]
+            } ]
+        } ]
+    },
+    "4" : {
+        "id" : "509",
+        "name" : "ScanFilterProject",
+        "descriptor" : {
+            "table" : "flights:public.flights$data@9119431624673072209",
+            "filterPredicate" : "((cancelled = boolean 'false') AND (diverted = boolean 'false'))",
+            "dynamicFilters" : "{origin = #df_1081}"
+        },
+        "outputs" : [ {
+            "type" : "varchar",
+            "name" : "origin"
+        }, {
+            "type" : "double",
+            "name" : "depdelay"
+        }, {
+            "type" : "integer",
+            "name" : "month"
+        }, {
+            "type" : "double",
+            "name" : "depdel15"
+        }, {
+            "type" : "varchar",
+            "name" : "deptimeblk"
+        }, {
+            "type" : "double",
+            "name" : "taxiout"
+        }, {
+            "type" : "double",
+            "name" : "arrdelay"
+        }, {
+            "type" : "bigint",
+            "name" : "expr_63"
+        } ],
+        "details" : [ "expr_63 := month(flightdate)", "flightdate := 1:flightdate:date", "depdelay := 10:depdelay:double", "deptimeblk := 50:deptimeblk:varchar", "taxiout := 51:taxiout:double", "cancelled := 5:cancelled:boolean", "origin := 3:origin:varchar", "depdel15 := 48:depdel15:double", "month := 19:month:integer", "arrdelay := 56:arrdelay:double", "diverted := 6:diverted:boolean" ],
+        "estimates" : [ {
+            "outputRowCount" : 2.33550256E8,
+            "outputSizeInBytes" : 1.4558881142E10,
+            "cpuCost" : 1.4558881142E10,
+            "memoryCost" : 0.0,
+            "networkCost" : 0.0
+        }, {
+            "outputRowCount" : 2.101952304E8,
+            "outputSizeInBytes" : 1.3102993027800001E10,
+            "cpuCost" : 1.4558881142E10,
+            "memoryCost" : 0.0,
+            "networkCost" : 0.0
+        }, {
+            "outputRowCount" : 2.101952304E8,
+            "outputSizeInBytes" : 1.3102993027800001E10,
+            "cpuCost" : 1.3102993027800001E10,
+            "memoryCost" : 0.0,
+            "networkCost" : 0.0
+        } ],
+        "children" : [ ]
+    },
+    "5" : {
+        "id" : "993",
+        "name" : "TopNRanking",
+        "descriptor" : {
+            "partitionBy" : "[gid]",
+            "orderBy" : "[count DESC NULLS LAST]",
+            "limit" : "10",
+            "hash" : "[]"
+        },
+        "outputs" : [ {
+            "type" : "varchar",
+            "name" : "origin_2"
+        }, {
+            "type" : "bigint",
+            "name" : "gid"
+        }, {
+            "type" : "bigint",
+            "name" : "count"
+        } ],
+        "details" : [ "rank := RANK" ],
+        "estimates" : [ ],
+        "children" : [ {
+            "id" : "5",
+            "name" : "Aggregate",
+            "descriptor" : {
+                "type" : "FINAL",
+                "keys" : "[origin_2, gid]",
+                "hash" : "[]"
+            },
+            "outputs" : [ {
+                "type" : "varchar",
+                "name" : "origin_2"
+            }, {
+                "type" : "bigint",
+                "name" : "gid"
+            }, {
+                "type" : "bigint",
+                "name" : "count"
+            } ],
+            "details" : [ "count := count(count_85)" ],
+            "estimates" : [ {
+                "outputRowCount" : "NaN",
+                "outputSizeInBytes" : "NaN",
+                "cpuCost" : 5.798955579E9,
+                "memoryCost" : "NaN",
+                "networkCost" : 0.0
+            } ],
+            "children" : [ {
+                "id" : "1256",
+                "name" : "LocalExchange",
+                "descriptor" : {
+                    "partitioning" : "HASH",
+                    "isReplicateNullsAndAny" : "",
+                    "hashColumn" : "[]",
+                    "arguments" : "[origin_2::varchar, gid::bigint]"
+                },
+                "outputs" : [ {
+                    "type" : "varchar",
+                    "name" : "origin_2"
+                }, {
+                    "type" : "bigint",
+                    "name" : "gid"
+                }, {
+                    "type" : "bigint",
+                    "name" : "count_85"
+                } ],
+                "details" : [ ],
+                "estimates" : [ {
+                    "outputRowCount" : 2.33550256E8,
+                    "outputSizeInBytes" : 5.798955579E9,
+                    "cpuCost" : 5.798955579E9,
+                    "memoryCost" : 0.0,
+                    "networkCost" : 0.0
+                } ],
+                "children" : [ {
+                    "id" : "1262",
+                    "name" : "RemoteSource",
+                    "descriptor" : {
+                        "sourceFragmentIds" : "[6]"
+                    },
+                    "outputs" : [ {
+                        "type" : "varchar",
+                        "name" : "origin_2"
+                    }, {
+                        "type" : "bigint",
+                        "name" : "gid"
+                    }, {
+                        "type" : "bigint",
+                        "name" : "count_85"
+                    } ],
+                    "details" : [ ],
+                    "estimates" : [ ],
+                    "children" : [ ]
+                } ]
+            } ]
+        } ]
+    },
+    "6" : {
+        "id" : "1260",
+        "name" : "Aggregate",
+        "descriptor" : {
+            "type" : "PARTIAL",
+            "keys" : "[origin_2, gid]",
+            "hash" : "[]"
+        },
+        "outputs" : [ {
+            "type" : "varchar",
+            "name" : "origin_2"
+        }, {
+            "type" : "bigint",
+            "name" : "gid"
+        }, {
+            "type" : "bigint",
+            "name" : "count_85"
+        } ],
+        "details" : [ "count_85 := count(*)" ],
+        "estimates" : [ {
+            "outputRowCount" : 2.33550256E8,
+            "outputSizeInBytes" : 5.798955579E9,
+            "cpuCost" : "NaN",
+            "memoryCost" : "NaN",
+            "networkCost" : "NaN"
+        } ],
+        "children" : [ {
+            "id" : "269",
+            "name" : "ScanProject",
+            "descriptor" : {
+                "table" : "flights:public.flights$data@9119431624673072209"
+            },
+            "outputs" : [ {
+                "type" : "varchar",
+                "name" : "origin_2"
+            }, {
+                "type" : "bigint",
+                "name" : "gid"
+            } ],
+            "details" : [ "gid := month(flightdate_0)", "flightdate_0 := 1:flightdate:date", "origin_2 := 3:origin:varchar" ],
+            "estimates" : [ {
+                "outputRowCount" : 2.33550256E8,
+                "outputSizeInBytes" : 3.697003275E9,
+                "cpuCost" : 2.762802251E9,
+                "memoryCost" : 0.0,
+                "networkCost" : 0.0
+            }, {
+                "outputRowCount" : 2.33550256E8,
+                "outputSizeInBytes" : 3.697003275E9,
+                "cpuCost" : 3.697003275E9,
+                "memoryCost" : 0.0,
+                "networkCost" : 0.0
+            } ],
+            "children" : [ ]
+        } ]
+    }
+}
