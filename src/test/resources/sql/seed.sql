@@ -1,2 +1,0 @@
--- Seed data for integration tests (empty for /new endpoint)
--- Add INSERT statements here when needed

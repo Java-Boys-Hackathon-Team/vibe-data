@@ -1,5 +1,8 @@
-package ru.javaboys.vibe_data.llm;
+package ru.javaboys.vibe_data.tools;
 
+import lombok.Getter;
+
+@Getter
 public enum TrinoExplainType {
     /**
      * Показывает логический план (какие операторы применяются в каком порядке).
@@ -42,9 +45,5 @@ public enum TrinoExplainType {
 
     TrinoExplainType(String name) {
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
     }
 }

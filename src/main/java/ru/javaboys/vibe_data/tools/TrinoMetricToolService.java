@@ -1,10 +1,8 @@
-package ru.javaboys.vibe_data.service;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
+package ru.javaboys.vibe_data.tools;
 
 import lombok.RequiredArgsConstructor;
-import ru.javaboys.vibe_data.llm.TrinoExplainType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor

@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
-import ru.javaboys.vibe_data.llm.TrinoExplainType;
-import ru.javaboys.vibe_data.service.TrinoMetricToolService;
 
 /**
  * Набор инструментов, доступных LLM через Tool Calling (Spring AI Function Calling).
@@ -22,7 +20,6 @@ public class TrinoPlanTools {
     public String explainLogicalJson(String sql) {
         log.info("Tool explainLogicalJson called with SQL: {}", sql);
         return trinoMetricToolService.requestExplainInJson(sql, TrinoExplainType.LOGICAL);
-        // Возвращаем JSON-план
     }
 
     @Tool(description = "Get Trino EXPLAIN DISTRIBUTED plan in JSON (FORMAT JSON) for given SQL.")
