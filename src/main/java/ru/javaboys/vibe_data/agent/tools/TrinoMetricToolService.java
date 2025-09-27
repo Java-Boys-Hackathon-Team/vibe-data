@@ -1,4 +1,4 @@
-package ru.javaboys.vibe_data.tools;
+package ru.javaboys.vibe_data.agent.tools;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
