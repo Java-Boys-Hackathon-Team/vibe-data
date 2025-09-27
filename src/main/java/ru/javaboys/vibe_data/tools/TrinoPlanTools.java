@@ -22,7 +22,6 @@ public class TrinoPlanTools {
     public String explainLogicalJson(String sql) {
         log.info("Tool explainLogicalJson called with SQL: {}", sql);
         return trinoMetricToolService.requestExplainInJson(sql, TrinoExplainType.LOGICAL);
-        // Возвращаем JSON-план
     }
 
     @Tool(description = "Get Trino EXPLAIN DISTRIBUTED plan in JSON (FORMAT JSON) for given SQL.")
