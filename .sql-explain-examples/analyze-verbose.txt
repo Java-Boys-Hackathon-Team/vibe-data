@@ -1,0 +1,338 @@
+Trino version: 468
+Queued: 191.73us, Analysis: 120.95ms, Planning: 119.64ms, Execution: 29.67s
+Fragment 1 [ROUND_ROBIN]
+CPU: 17.48ms, Scheduled: 21.29ms, Blocked 32.35m (Input: 30.39m, Output: 0.00ns), Input: 240 rows (24.38kB); per task: avg.: 120.00 std.dev.: 51.00, Output: 240 rows (24.38kB)
+Peak Memory: 29.38kB, Tasks count: 2; per task: max: 1.01MB
+Output buffer active time: 14.40ms, buffer utilization distribution (%): {p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.06}
+Task output distribution: {count=2.00, p01=7.00kB, p05=7.00kB, p10=7.00kB, p25=7.00kB, p50=17.38kB, p75=17.38kB, p90=17.38kB, p95=17.38kB, p99=17.38kB, max=17.38kB}
+Task input distribution: {count=2.00, p01=7.00kB, p05=7.00kB, p10=7.00kB, p25=7.00kB, p50=17.38kB, p75=17.38kB, p90=17.38kB, p95=17.38kB, p99=17.38kB, max=17.38kB}
+Amount of input data processed by the workers for this stage might be skewed
+Output layout: [month, origin, expr_64_gid, count_68, sum, expr_72, expr_73, expr_74, expr_75, expr_76, expr_77]
+Output partitioning: SINGLE []
+LocalMerge[orderBy = [month DESC NULLS LAST, origin ASC NULLS LAST, expr_64_gid ASC NULLS LAST]]
+│   Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_68:bigint, sum:bigint, expr_72:double, expr_73:double, expr_74:double, expr_75:double, expr_76:double, expr_77:decimal(24,1)]
+│   Estimates: {rows: ? (?), cpu: 0, memory: 0B, network: 0B}
+│   CPU: 2.00ms (0.00%), Scheduled: 2.00ms (0.00%), Blocked: 58.82s (0.64%), Output: 240 rows (24.38kB)
+│   metrics:
+│     'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│     'Input rows distribution' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=1.00, p75=4.00, p90=10.00, p95=11.00, p99=37.00, min=0.00, max=37.00}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│   Input avg.: 3.75 rows, Input std.dev.: 182.94%
+└─ PartialSort[orderBy = [month DESC NULLS LAST, origin ASC NULLS LAST, expr_64_gid ASC NULLS LAST]]
+│   Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_68:bigint, sum:bigint, expr_72:double, expr_73:double, expr_74:double, expr_75:double, expr_76:double, expr_77:decimal(24,1)]
+│   CPU: 10.00ms (0.01%), Scheduled: 11.00ms (0.00%), Blocked: 0.00ns (0.00%), Output: 240 rows (24.38kB)
+│   metrics:
+│     'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│     'Input rows distribution' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=1.00, p75=4.00, p90=10.00, p95=11.00, p99=37.00, min=0.00, max=37.00}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│   Input avg.: 3.75 rows, Input std.dev.: 182.94%
+└─ RemoteSource[sourceFragmentIds = [2]]
+Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_68:bigint, sum:bigint, expr_72:double, expr_73:double, expr_74:double, expr_75:double, expr_76:double, expr_77:decimal(24,1)]
+CPU: 3.00ms (0.00%), Scheduled: 4.00ms (0.00%), Blocked: 30.39m (19.80%), Output: 240 rows (24.38kB)
+metrics:
+'Blocked time distribution (s)' = {count=64, p01=0.00, p05=29.40, p10=29.40, p25=29.40, p50=29.41, p75=29.41, p90=29.42, p95=29.42, p99=29.42, min=0.00, max=29.42}
+'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+'Input rows distribution' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=1.00, p75=4.00, p90=10.00, p95=11.00, p99=37.00, min=0.00, max=37.00}
+'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+Input avg.: 3.75 rows, Input std.dev.: 182.94%
+
+Fragment 2 [HASH]
+CPU: 116.79ms, Scheduled: 151.27ms, Blocked 59.48m (Input: 30.31m, Output: 0.00ns), Input: 7680 rows (1.53MB); per task: avg.: 3840.00 std.dev.: 128.00, Output: 240 rows (24.38kB)
+Peak Memory: 7.50kB, Tasks count: 2; per task: max: 7.00kB
+Output buffer active time: 44.85ms, buffer utilization distribution (%): {p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.05}
+Task output distribution: {count=2.00, p01=11.79kB, p05=11.79kB, p10=11.79kB, p25=11.79kB, p50=12.59kB, p75=12.59kB, p90=12.59kB, p95=12.59kB, p99=12.59kB, max=12.59kB}
+Task input distribution: {count=2.00, p01=757.88kB, p05=757.88kB, p10=757.88kB, p25=757.88kB, p50=809.63kB, p75=809.63kB, p90=809.63kB, p95=809.63kB, p99=809.63kB, max=809.63kB}
+Output layout: [month, origin, expr_64_gid, count_68, sum, expr_72, expr_73, expr_74, expr_75, expr_76, expr_77]
+Output partitioning: ROUND_ROBIN []
+Project[]
+│   Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_68:bigint, sum:bigint, expr_72:double, expr_73:double, expr_74:double, expr_75:double, expr_76:double, expr_77:decimal(24,1)]
+│   Estimates: {rows: ? (?), cpu: ?, memory: 0B, network: 0B}
+│   CPU: 25.00ms (0.02%), Scheduled: 29.00ms (0.01%), Blocked: 0.00ns (0.00%), Output: 240 rows (24.38kB)
+│   metrics:
+│     'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│     'Input rows distribution' = {count=64, p01=1.00, p05=1.00, p10=1.00, p25=2.00, p50=4.00, p75=5.00, p90=6.00, p95=7.00, p99=10.00, min=1.00, max=10.00}
+│     'Projection CPU time' = {duration=8.98ms}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│   Input avg.: 3.75 rows, Input std.dev.: 51.64%
+│   expr_72 := round(avg, integer '2')
+│   expr_73 := round(avg_69, integer '2')
+│   expr_74 := round(avg_70, integer '2')
+│   expr_75 := round(corr, integer '2')
+│   expr_76 := round(corr_71, integer '2')
+│   expr_77 := round($operator$divide($operator$multiply(CAST(sum AS decimal(19,0)), decimal(4,1) '100.0'), CAST(count_68 AS decimal(19,0))), integer '2')
+└─ Aggregate[type = FINAL, keys = [month, origin, expr_64_gid]]
+│   Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_68:bigint, avg:double, avg_69:double, avg_70:double, corr:double, corr_71:double, sum:bigint]
+│   Estimates: {rows: ? (?), cpu: ?, memory: ?, network: 0B}
+│   CPU: 58.00ms (0.04%), Scheduled: 83.00ms (0.02%), Blocked: 0.00ns (0.00%), Output: 240 rows (20.39kB)
+│   metrics:
+│     'Accumulator update CPU time' = {duration=12.75ms}
+│     'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│     'Group by hash update CPU time' = {duration=3.54ms}
+│     'Input rows distribution' = {count=64, p01=32.00, p05=32.00, p10=32.00, p25=64.00, p50=128.00, p75=160.00, p90=192.00, p95=224.00, p99=320.00, min=32.00, max=320.00}
+│     'Input rows processed without partial aggregation enabled' = LongCount{total=0}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.01, min=0.00, max=0.01}
+│   Input avg.: 120.00 rows, Input std.dev.: 51.64%
+│   count_68 := count(count_78)
+│   avg := avg(avg_79)
+│   avg_69 := avg(avg_80)
+│   avg_70 := avg(avg_81)
+│   corr := corr(corr_82)
+│   corr_71 := corr(corr_83)
+│   sum := sum(sum_84)
+└─ LocalExchange[partitioning = HASH, arguments = [month::integer, origin::varchar, expr_64_gid::varchar(8)]]
+│   Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_78:bigint, avg_79:row(double, bigint), avg_80:row(double, bigint), avg_81:row(double, bigint), corr_82:row(double, bigint, double, double, double, double), corr_83:row(double, bigint, double, double, double, double), sum_84:bigint]
+│   Estimates: {rows: ? (?), cpu: ?, memory: 0B, network: 0B}
+│   CPU: 23.00ms (0.02%), Scheduled: 31.00ms (0.01%), Blocked: 29.18m (19.01%), Output: 7680 rows (1.53MB)
+│   metrics:
+│     'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│     'Input rows distribution' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=78.00, p90=415.00, p95=656.00, p99=1733.00, min=0.00, max=1733.00}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│   Input avg.: 120.00 rows, Input std.dev.: 251.20%
+└─ RemoteSource[sourceFragmentIds = [3]]
+Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_78:bigint, avg_79:row(double, bigint), avg_80:row(double, bigint), avg_81:row(double, bigint), corr_82:row(double, bigint, double, double, double, double), corr_83:row(double, bigint, double, double, double, double), sum_84:bigint]
+CPU: 3.00ms (0.00%), Scheduled: 3.00ms (0.00%), Blocked: 30.31m (19.74%), Output: 7680 rows (1.53MB)
+metrics:
+'Blocked time distribution (s)' = {count=64, p01=24.54, p05=25.66, p10=25.84, p25=27.96, p50=29.35, p75=29.37, p90=29.37, p95=29.37, p99=29.37, min=24.54, max=29.37}
+'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+'Input rows distribution' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=78.00, p90=415.00, p95=656.00, p99=1733.00, min=0.00, max=1733.00}
+'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+Input avg.: 120.00 rows, Input std.dev.: 251.20%
+
+Fragment 3 [HASH]
+CPU: 1.06m, Scheduled: 2.04m, Blocked 55.78m (Input: 18.30m, Output: 0.00ns), Input: 107248371 rows (7.19GB); per task: avg.: 53624185.50 std.dev.: 18974677.50, Output: 7680 rows (1.68MB)
+Peak Memory: 134.80MB, Tasks count: 2; per task: max: 89.43MB
+Output buffer active time: 56.06ms, buffer utilization distribution (%): {p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=3.18}
+Task output distribution: {count=2.00, p01=572.50kB, p05=572.50kB, p10=572.50kB, p25=572.50kB, p50=1.12MB, p75=1.12MB, p90=1.12MB, p95=1.12MB, p99=1.12MB, max=1.12MB}
+Task input distribution: {count=2.00, p01=2.32GB, p05=2.32GB, p10=2.32GB, p25=2.32GB, p50=4.87GB, p75=4.87GB, p90=4.87GB, p95=4.87GB, p99=4.87GB, max=4.87GB}
+Amount of input data processed by the workers for this stage might be skewed
+Output layout: [month, origin, expr_64_gid, count_78, avg_79, avg_80, avg_81, corr_82, corr_83, sum_84]
+Output partitioning: HASH [month, origin, expr_64_gid]
+Aggregate[type = PARTIAL, keys = [month, origin, expr_64_gid]]
+│   Layout: [month:integer, origin:varchar, expr_64_gid:varchar(8), count_78:bigint, avg_79:row(double, bigint), avg_80:row(double, bigint), avg_81:row(double, bigint), corr_82:row(double, bigint, double, double, double, double), corr_83:row(double, bigint, double, double, double, double), sum_84:bigint]
+│   CPU: 23.57s (16.63%), Scheduled: 46.16s (13.51%), Blocked: 0.00ns (0.00%), Output: 7680 rows (1.68MB)
+│   metrics:
+│     'Accumulator update CPU time' = {duration=9.48s}
+│     'CPU time distribution (s)' = {count=64, p01=0.15, p05=0.16, p10=0.17, p25=0.18, p50=0.40, p75=0.53, p90=0.61, p95=0.64, p99=0.84, min=0.15, max=0.84}
+│     'Group by hash update CPU time' = {duration=33.32s}
+│     'Input rows distribution' = {count=64, p01=597504.00, p05=627109.00, p10=645066.00, p25=723639.00, p50=1167887.00, p75=1535357.00, p90=1760366.00, p95=1928333.00, p99=2431291.00, min=597504.00, max=2431291.00}
+│     'Input rows processed without partial aggregation enabled' = LongCount{total=0}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.18, p05=0.19, p10=0.21, p25=0.24, p50=0.84, p75=1.15, p90=1.29, p95=1.43, p99=1.97, min=0.18, max=1.97}
+│   Input avg.: 1160808.13 rows, Input std.dev.: 39.92%
+│   count_78 := count(*)
+│   avg_79 := avg(taxiout)
+│   avg_80 := avg(depdelay)
+│   avg_81 := avg(arrdelay)
+│   corr_82 := corr(taxiout, depdelay)
+│   corr_83 := corr(taxiout, arrdelay)
+│   sum_84 := sum(expr_66)
+└─ Project[]
+│   Layout: [depdelay:double, taxiout:double, arrdelay:double, expr_66:bigint, month:integer, origin:varchar, expr_64_gid:varchar(8)]
+│   Estimates: {rows: ? (?), cpu: ?, memory: 0B, network: 0B}
+│   CPU: 12.20s (8.61%), Scheduled: 23.29s (6.82%), Blocked: 0.00ns (0.00%), Output: 74291720 rows (5.58GB)
+│   metrics:
+│     'CPU time distribution (s)' = {count=64, p01=0.08, p05=0.09, p10=0.09, p25=0.10, p50=0.19, p75=0.28, p90=0.31, p95=0.34, p99=0.43, min=0.08, max=0.43}
+│     'Input rows distribution' = {count=64, p01=597504.00, p05=627109.00, p10=645066.00, p25=723639.00, p50=1167887.00, p75=1535357.00, p90=1760366.00, p95=1928333.00, p99=2431291.00, min=597504.00, max=2431291.00}
+│     'Projection CPU time' = {duration=17.58s}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.09, p05=0.11, p10=0.11, p25=0.12, p50=0.36, p75=0.59, p90=0.71, p95=0.75, p99=1.22, min=0.09, max=1.22}
+│   Input avg.: 1160808.13 rows, Input std.dev.: 39.92%
+│   expr_66 := CAST((CASE WHEN (depdel15 = double '1.0') THEN integer '1' ELSE integer '0' END) AS bigint)
+│   expr_64_gid := (CASE WHEN (deptimeblk IN (varchar '0600-0659', varchar '0700-0759', varchar '0800-0859', varchar '1600-1659', varchar '1700-1759', varchar '1800-1859')) THEN varchar(8) 'Peak' ELSE varchar(8) 'Off-Peak' END)
+└─ InnerJoin[criteria = (origin = origin_2) AND (expr_63 = gid), distribution = PARTITIONED]
+│   Layout: [origin:varchar, depdelay:double, month:integer, depdel15:double, deptimeblk:varchar, taxiout:double, arrdelay:double]
+│   Estimates: {rows: ? (?), cpu: ?, memory: ?, network: 0B}
+│   CPU: 21.52s (15.18%), Scheduled: 40.68s (11.91%), Blocked: 20.13m (13.11%), Output: 74291720 rows (6.30GB)
+│   Left (probe) metrics:
+│     'Blocked time distribution (s)' = {count=64, p01=0.64, p05=0.65, p10=0.66, p25=1.87, p50=2.05, p75=2.30, p90=3.83, p95=4.24, p99=4.34, min=0.64, max=4.34}
+│     'CPU time distribution (s)' = {count=64, p01=0.15, p05=0.16, p10=0.17, p25=0.18, p50=0.32, p75=0.45, p90=0.55, p95=0.62, p99=0.80, min=0.15, max=0.80}
+│     'Input rows distribution' = {count=64, p01=869884.00, p05=915465.00, p10=965153.00, p25=1043199.00, p50=1617315.00, p75=2166685.00, p90=2574211.00, p95=3192074.00, p99=3795596.00, min=869884.00, max=3795596.00}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.18, p05=0.18, p10=0.20, p25=0.23, p50=0.62, p75=1.03, p90=1.14, p95=1.28, p99=1.72, min=0.18, max=1.72}
+│   Right (build) metrics:
+│     'Blocked time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=22.76, p75=22.76, p90=22.78, p95=22.78, p99=22.78, min=0.00, max=22.78}
+│     'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│     'Input rows distribution' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=1.00, p50=2.00, p75=3.00, p90=4.00, p95=4.00, p99=5.00, min=0.00, max=5.00}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│   Left (probe) Input avg.: 1675684.92 rows, Input std.dev.: 41.96%
+│   Right (build) Input avg.: 1.88 rows, Input std.dev.: 66.33%
+│   Distribution: PARTITIONED
+│   dynamicFilterAssignments = {origin_2 -> #df_1135}
+├─ RemoteSource[sourceFragmentIds = [4]]
+│      Layout: [origin:varchar, depdelay:double, month:integer, depdel15:double, deptimeblk:varchar, taxiout:double, arrdelay:double, expr_63:bigint]
+│      CPU: 6.26s (4.42%), Scheduled: 12.31s (3.60%), Blocked: 11.98m (7.81%), Output: 107243835 rows (7.19GB)
+│      metrics:
+│        'Blocked time distribution (s)' = {count=64, p01=0.76, p05=0.81, p10=0.83, p25=0.85, p50=21.15, p75=21.50, p90=21.64, p95=21.68, p99=21.78, min=0.76, max=21.78}
+│        'CPU time distribution (s)' = {count=64, p01=0.05, p05=0.05, p10=0.05, p25=0.06, p50=0.09, p75=0.13, p90=0.16, p95=0.18, p99=0.23, min=0.05, max=0.23}
+│        'Input rows distribution' = {count=64, p01=869884.00, p05=915465.00, p10=965153.00, p25=1043199.00, p50=1617315.00, p75=2166685.00, p90=2574211.00, p95=3192074.00, p99=3795596.00, min=869884.00, max=3795596.00}
+│        'Scheduled time distribution (s)' = {count=64, p01=0.05, p05=0.06, p10=0.06, p25=0.07, p50=0.12, p75=0.31, p90=0.38, p95=0.40, p99=0.59, min=0.05, max=0.59}
+│      Input avg.: 1675684.92 rows, Input std.dev.: 41.96%
+└─ LocalExchange[partitioning = HASH, arguments = [origin_2::varchar, gid::bigint]]
+│   Layout: [origin_2:varchar, gid:bigint]
+│   Estimates: {rows: ? (?), cpu: ?, memory: 0B, network: 0B}
+│   CPU: 1.00ms (0.00%), Scheduled: 1.00ms (0.00%), Blocked: 5.11m (3.33%), Output: 120 rows (1.99kB)
+│   metrics:
+│     'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│     'Input rows distribution' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=10.00, p95=10.00, p99=10.00, min=0.00, max=10.00}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│   Input avg.: 1.88 rows, Input std.dev.: 208.17%
+└─ Project[]
+│   Layout: [origin_2:varchar, gid:bigint]
+│   Estimates: {rows: ? (?), cpu: ?, memory: 0B, network: 0B}
+│   CPU: 3.00ms (0.00%), Scheduled: 3.00ms (0.00%), Blocked: 0.00ns (0.00%), Output: 120 rows (1.99kB)
+│   metrics:
+│     'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│     'Input rows distribution' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=10.00, p95=10.00, p99=10.00, min=0.00, max=10.00}
+│     'Projection CPU time' = {duration=42.90us}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│   Input avg.: 1.88 rows, Input std.dev.: 208.17%
+└─ TopNRanking[partitionBy = [gid], orderBy = [count DESC NULLS LAST], limit = 10]
+│   Layout: [origin_2:varchar, gid:bigint, count:bigint, rank:bigint]
+│   CPU: 13.00ms (0.01%), Scheduled: 14.00ms (0.00%), Blocked: 0.00ns (0.00%), Output: 120 rows (4.10kB)
+│   metrics:
+│     'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│     'Input rows distribution' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=379.00, p95=380.00, p99=383.00, min=0.00, max=383.00}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│   Input avg.: 70.88 rows, Input std.dev.: 208.18%
+│   rank := RANK
+└─ LocalExchange[partitioning = HASH, arguments = [gid::bigint]]
+│   Layout: [origin_2:varchar, gid:bigint, count:bigint]
+│   Estimates: {rows: ? (?), cpu: ?, memory: 0B, network: 0B}
+│   CPU: 5.00ms (0.00%), Scheduled: 6.00ms (0.00%), Blocked: 5.65m (3.68%), Output: 4536 rows (115.17kB)
+│   metrics:
+│     'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│     'Input rows distribution' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=53.00, p90=186.00, p95=490.00, p99=1005.00, min=0.00, max=1005.00}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│   Input avg.: 70.88 rows, Input std.dev.: 245.98%
+└─ RemoteSource[sourceFragmentIds = [5]]
+Layout: [origin_2:varchar, gid:bigint, count:bigint]
+CPU: 2.00ms (0.00%), Scheduled: 2.00ms (0.00%), Blocked: 6.31m (4.11%), Output: 4536 rows (115.17kB)
+metrics:
+'Blocked time distribution (s)' = {count=64, p01=0.63, p05=0.63, p10=1.71, p25=6.56, p50=6.56, p75=6.56, p90=6.56, p95=6.57, p99=6.57, min=0.63, max=6.57}
+'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+'Input rows distribution' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=53.00, p90=186.00, p95=490.00, p99=1005.00, min=0.00, max=1005.00}
+'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+Input avg.: 70.88 rows, Input std.dev.: 245.98%
+
+Fragment 4 [SOURCE]
+CPU: 40.41s, Scheduled: 2.37m, Blocked 1.71m (Input: 0.00ns, Output: 1.71m), Input: 233550256 rows (12.48GB); per task: avg.: 116775128.00 std.dev.: 780587.00, Output: 107243835 rows (5.36GB)
+Peak Memory: 315.13MB, Tasks count: 2; per task: max: 177.30MB
+Output buffer active time: 46.56s, buffer utilization distribution (%): {p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=121.75}
+Task output distribution: {count=2.00, p01=2.67GB, p05=2.67GB, p10=2.67GB, p25=2.67GB, p50=2.69GB, p75=2.69GB, p90=2.69GB, p95=2.69GB, p99=2.69GB, max=2.69GB}
+Task input distribution: {count=2.00, p01=6.20GB, p05=6.20GB, p10=6.20GB, p25=6.20GB, p50=6.28GB, p75=6.28GB, p90=6.28GB, p95=6.28GB, p99=6.28GB, max=6.28GB}
+Output layout: [origin, depdelay, month, depdel15, deptimeblk, taxiout, arrdelay, expr_63]
+Output partitioning: HASH [expr_63]
+ScanFilterProject[table = flights:public.flights$data@9119431624673072209, filterPredicate = ((cancelled = boolean 'false') AND (diverted = boolean 'false')), dynamicFilters = {origin = #df_1135}]
+Layout: [origin:varchar, depdelay:double, month:integer, depdel15:double, deptimeblk:varchar, taxiout:double, arrdelay:double, expr_63:bigint]
+Estimates: {rows: 233550256 (13.56GB), cpu: 13.56G, memory: 0B, network: 0B}/{rows: 210195230 (12.20GB), cpu: 13.56G, memory: 0B, network: 0B}/{rows: 210195230 (12.20GB), cpu: 12.20G, memory: 0B, network: 0B}
+CPU: 40.38s (28.49%), Scheduled: 2.37m (41.61%), Blocked: 1.71m (1.11%), Output: 107243835 rows (5.36GB)
+connector metrics:
+'ParquetReaderCompressionFormat_ZSTD' = LongCount{total=1069604614}
+metrics:
+'CPU time distribution (s)' = {count=83, p01=0.02, p05=0.12, p10=0.15, p25=0.34, p50=0.37, p75=0.41, p90=0.45, p95=0.52, p99=0.54, min=0.02, max=0.54}
+'Dynamic Filter CPU time' = {duration=528.04ms}
+'Dynamic Filter output positions' = LongCount{total=110245961}
+'Filter CPU time' = {duration=935.04ms}
+'Input rows distribution' = {count=83, p01=36864.00, p05=677833.00, p10=1041198.00, p25=3131392.00, p50=3188736.00, p75=3190784.00, p90=3192979.00, p95=3250176.00, p99=3307512.00, min=36864.00, max=3307512.00}
+'Projection CPU time' = {duration=1.05s}
+'Scheduled time distribution (s)' = {count=83, p01=0.15, p05=0.66, p10=0.70, p25=1.17, p50=1.46, p75=1.69, p90=1.93, p95=2.19, p99=2.80, min=0.15, max=2.80}
+Input avg.: 2813858.51 rows, Input std.dev.: 30.53%
+expr_63 := month(flightdate)
+flightdate := 1:flightdate:date
+depdelay := 10:depdelay:double
+deptimeblk := 50:deptimeblk:varchar
+taxiout := 51:taxiout:double
+cancelled := 5:cancelled:boolean
+origin := 3:origin:varchar
+depdel15 := 48:depdel15:double
+month := 19:month:integer
+arrdelay := 56:arrdelay:double
+diverted := 6:diverted:boolean
+Input: 233550256 rows (12.48GB), Filtered: 54.08%, Physical input: 1.09GB, Physical input time: 1.17m
+Dynamic filters:
+- df_1135, [ SortedRangeSet[type=varchar, ranges=11, {[ATL], ..., [SEA]}] ], collection time=6.62s
+
+Fragment 5 [HASH]
+CPU: 204.69ms, Scheduled: 324.85ms, Blocked 11.77m (Input: 5.42m, Output: 0.00ns), Input: 357649 rows (8.87MB); per task: avg.: 178824.50 std.dev.: 250.50, Output: 4536 rows (115.17kB)
+Peak Memory: 48.72MB, Tasks count: 2; per task: max: 24.38MB
+Output buffer active time: 48.43ms, buffer utilization distribution (%): {p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.19}
+Task output distribution: {count=2.00, p01=57.56kB, p05=57.56kB, p10=57.56kB, p25=57.56kB, p50=57.61kB, p75=57.61kB, p90=57.61kB, p95=57.61kB, p99=57.61kB, max=57.61kB}
+Task input distribution: {count=2.00, p01=4.43MB, p05=4.43MB, p10=4.43MB, p25=4.43MB, p50=4.44MB, p75=4.44MB, p90=4.44MB, p95=4.44MB, p99=4.44MB, max=4.44MB}
+Output layout: [origin_2, gid, count]
+Output partitioning: HASH [gid]
+TopNRanking[partitionBy = [gid], orderBy = [count DESC NULLS LAST], limit = 10]
+│   Layout: [origin_2:varchar, gid:bigint, count:bigint]
+│   CPU: 47.00ms (0.03%), Scheduled: 97.00ms (0.03%), Blocked: 0.00ns (0.00%), Output: 4536 rows (115.17kB)
+│   metrics:
+│     'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│     'Input rows distribution' = {count=64, p01=57.00, p05=61.00, p10=62.00, p25=67.00, p50=72.00, p75=79.00, p90=81.00, p95=83.00, p99=88.00, min=57.00, max=88.00}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.01, p99=0.01, min=0.00, max=0.01}
+│   Input avg.: 71.83 rows, Input std.dev.: 10.36%
+│   rank := RANK
+└─ Aggregate[type = FINAL, keys = [origin_2, gid]]
+│   Layout: [origin_2:varchar, gid:bigint, count:bigint]
+│   Estimates: {rows: ? (?), cpu: 5.40G, memory: ?, network: 0B}
+│   CPU: 86.00ms (0.06%), Scheduled: 92.00ms (0.03%), Blocked: 0.00ns (0.00%), Output: 4597 rows (116.72kB)
+│   metrics:
+│     'Accumulator update CPU time' = {duration=1.70ms}
+│     'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│     'Group by hash update CPU time' = {duration=61.79ms}
+│     'Input rows distribution' = {count=64, p01=4460.00, p05=4717.00, p10=4775.00, p25=5206.00, p50=5573.00, p75=6035.00, p90=6344.00, p95=6433.00, p99=6962.00, min=4460.00, max=6962.00}
+│     'Input rows processed without partial aggregation enabled' = LongCount{total=0}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+│   Input avg.: 5588.27 rows, Input std.dev.: 10.57%
+│   count := count(count_85)
+└─ LocalExchange[partitioning = HASH, arguments = [origin_2::varchar, gid::bigint]]
+│   Layout: [origin_2:varchar, gid:bigint, count_85:bigint]
+│   Estimates: {rows: 233550256 (5.40GB), cpu: 5.40G, memory: 0B, network: 0B}
+│   CPU: 57.00ms (0.04%), Scheduled: 122.00ms (0.04%), Blocked: 6.35m (4.14%), Output: 357649 rows (8.87MB)
+│   metrics:
+│     'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.01, min=0.00, max=0.01}
+│     'Input rows distribution' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=11144.00, p90=12187.00, p95=12889.00, p99=35702.00, min=0.00, max=35702.00}
+│     'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.04, min=0.00, max=0.04}
+│   Input avg.: 5588.27 rows, Input std.dev.: 133.63%
+└─ RemoteSource[sourceFragmentIds = [6]]
+Layout: [origin_2:varchar, gid:bigint, count_85:bigint]
+CPU: 4.00ms (0.00%), Scheduled: 4.00ms (0.00%), Blocked: 5.42m (3.53%), Output: 357649 rows (8.87MB)
+metrics:
+'Blocked time distribution (s)' = {count=64, p01=2.87, p05=3.06, p10=3.33, p25=4.25, p50=5.58, p75=5.72, p90=6.50, p95=6.54, p99=6.54, min=2.87, max=6.54}
+'CPU time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+'Input rows distribution' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=11144.00, p90=12187.00, p95=12889.00, p99=35702.00, min=0.00, max=35702.00}
+'Scheduled time distribution (s)' = {count=64, p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=0.00}
+Input avg.: 5588.27 rows, Input std.dev.: 133.63%
+
+Fragment 6 [SOURCE]
+CPU: 37.45s, Scheduled: 1.28m, Blocked 0.00ns (Input: 0.00ns, Output: 0.00ns), Input: 233550256 rows (1.81GB); per task: avg.: 116775128.00 std.dev.: 1264169.00, Output: 357649 rows (8.87MB)
+Peak Memory: 72.62MB, Tasks count: 2; per task: max: 37.40MB
+Output buffer active time: 1.60s, buffer utilization distribution (%): {p01=0.00, p05=0.00, p10=0.00, p25=0.00, p50=0.00, p75=0.00, p90=0.00, p95=0.00, p99=0.00, min=0.00, max=2.40}
+Task output distribution: {count=2.00, p01=4.40MB, p05=4.40MB, p10=4.40MB, p25=4.40MB, p50=4.47MB, p75=4.47MB, p90=4.47MB, p95=4.47MB, p99=4.47MB, max=4.47MB}
+Task input distribution: {count=2.00, p01=916.81MB, p05=916.81MB, p10=916.81MB, p25=916.81MB, p50=936.98MB, p75=936.98MB, p90=936.98MB, p95=936.98MB, p99=936.98MB, max=936.98MB}
+Output layout: [origin_2, gid, count_85]
+Output partitioning: HASH [origin_2, gid]
+Aggregate[type = PARTIAL, keys = [origin_2, gid]]
+│   Layout: [origin_2:varchar, gid:bigint, count_85:bigint]
+│   Estimates: {rows: 233550256 (5.40GB), cpu: ?, memory: ?, network: ?}
+│   CPU: 30.93s (21.82%), Scheduled: 50.95s (14.91%), Blocked: 0.00ns (0.00%), Output: 357649 rows (8.87MB)
+│   metrics:
+│     'Accumulator update CPU time' = {duration=1.00s}
+│     'CPU time distribution (s)' = {count=83, p01=0.01, p05=0.09, p10=0.18, p25=0.33, p50=0.37, p75=0.47, p90=0.51, p95=0.52, p99=0.59, min=0.01, max=0.59}
+│     'Group by hash update CPU time' = {duration=46.14s}
+│     'Input rows distribution' = {count=83, p01=36864.00, p05=677833.00, p10=1041198.00, p25=3131392.00, p50=3188736.00, p75=3190784.00, p90=3192979.00, p95=3250176.00, p99=3307512.00, min=36864.00, max=3307512.00}
+│     'Input rows processed without partial aggregation enabled' = LongCount{total=0}
+│     'Scheduled time distribution (s)' = {count=83, p01=0.01, p05=0.11, p10=0.22, p25=0.47, p50=0.62, p75=0.80, p90=0.95, p95=1.03, p99=1.07, min=0.01, max=1.07}
+│   Input avg.: 2813858.51 rows, Input std.dev.: 30.53%
+│   count_85 := count(*)
+└─ ScanProject[table = flights:public.flights$data@9119431624673072209]
+Layout: [origin_2:varchar, gid:bigint]
+Estimates: {rows: 233550256 (3.44GB), cpu: 2.57G, memory: 0B, network: 0B}/{rows: 233550256 (3.44GB), cpu: 3.44G, memory: 0B, network: 0B}
+CPU: 6.54s (4.61%), Scheduled: 25.58s (7.49%), Blocked: 0.00ns (0.00%), Output: 233550256 rows (1.83GB)
+connector metrics:
+'ParquetReaderCompressionFormat_ZSTD' = LongCount{total=256161553}
+metrics:
+'CPU time distribution (s)' = {count=83, p01=0.01, p05=0.02, p10=0.04, p25=0.07, p50=0.08, p75=0.10, p90=0.11, p95=0.11, p99=0.11, min=0.01, max=0.11}
+'Input rows distribution' = {count=83, p01=36864.00, p05=677833.00, p10=1041198.00, p25=3131392.00, p50=3188736.00, p75=3190784.00, p90=3192979.00, p95=3250176.00, p99=3307512.00, min=36864.00, max=3307512.00}
+'Projection CPU time' = {duration=446.75ms}
+'Scheduled time distribution (s)' = {count=83, p01=0.06, p05=0.14, p10=0.20, p25=0.24, p50=0.31, p75=0.37, p90=0.43, p95=0.47, p99=0.59, min=0.06, max=0.59}
+Input avg.: 2813858.51 rows, Input std.dev.: 30.53%
+gid := month(flightdate_0)
+flightdate_0 := 1:flightdate:date
+origin_2 := 3:origin:varchar
+Input: 233550256 rows (1.81GB), Filtered: 0.00%, Physical input: 263.20MB, Physical input time: 16.47s
+

@@ -3,6 +3,7 @@ package ru.javaboys.vibe_data;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestExecutionListeners;
+
 import ru.javaboys.utils.DotenvTestExecutionListener;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -19,8 +20,8 @@ import ru.javaboys.utils.DotenvTestExecutionListener;
 )
 class VibeDataApplicationTests extends ru.javaboys.vibe_data.testutil.PostgresTestBase {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }

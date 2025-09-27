@@ -1,0 +1,80 @@
+{
+    "inputTableColumnInfos" : [ {
+        "table" : {
+            "catalog" : "flights",
+            "schemaTable" : {
+                "schema" : "public",
+                "table" : "flights"
+            }
+        },
+        "constraint" : {
+            "none" : false,
+            "columnConstraints" : [ {
+                "columnName" : "cancelled",
+                "type" : "boolean",
+                "domain" : {
+                    "nullsAllowed" : false,
+                    "ranges" : [ {
+                        "low" : {
+                            "value" : "false",
+                            "bound" : "EXACTLY"
+                        },
+                        "high" : {
+                            "value" : "false",
+                            "bound" : "EXACTLY"
+                        }
+                    } ]
+                }
+            }, {
+                "columnName" : "diverted",
+                "type" : "boolean",
+                "domain" : {
+                    "nullsAllowed" : false,
+                    "ranges" : [ {
+                        "low" : {
+                            "value" : "false",
+                            "bound" : "EXACTLY"
+                        },
+                        "high" : {
+                            "value" : "false",
+                            "bound" : "EXACTLY"
+                        }
+                    } ]
+                }
+            } ]
+        },
+        "estimate" : {
+            "outputRowCount" : 2.33550256E8,
+            "outputSizeInBytes" : 1.4558881142E10,
+            "cpuCost" : 1.4558881142E10,
+            "maxMemory" : 0.0,
+            "networkCost" : 0.0
+        }
+    }, {
+        "table" : {
+            "catalog" : "flights",
+            "schemaTable" : {
+                "schema" : "public",
+                "table" : "flights"
+            }
+        },
+        "constraint" : {
+            "none" : false,
+            "columnConstraints" : [ ]
+        },
+        "estimate" : {
+            "outputRowCount" : 2.33550256E8,
+            "outputSizeInBytes" : 2.762802251E9,
+            "cpuCost" : 2.762802251E9,
+            "maxMemory" : 0.0,
+            "networkCost" : 0.0
+        }
+    } ],
+    "estimate" : {
+        "outputRowCount" : "NaN",
+        "outputSizeInBytes" : "NaN",
+        "cpuCost" : "NaN",
+        "maxMemory" : "NaN",
+        "networkCost" : "NaN"
+    }
+}
