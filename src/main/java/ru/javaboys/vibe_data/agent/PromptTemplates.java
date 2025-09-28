@@ -18,6 +18,12 @@ public final class PromptTemplates {
             {catalogSchemaRule}
             """;
 
+    public static final String SYSTEM_ROLE_WIITH_OPTIMIZATIONS = SYSTEM_ROLE + """
+            Дополнительно у тебя есть набор рекомендаций по оптимизации, которые нужно всегда учитывать при формировании ответа.
+            Эти рекомендации не заменяют твои знания, а являются уточняющими правилами для генерации более качественных решений.
+            Список этих рекомендаций:
+            {optimizations}
+            """;
 
     public static final String RULES = """
             - Работайте только для Trino с коннектором Iceberg, DDL должен быть валиден для Iceberg.

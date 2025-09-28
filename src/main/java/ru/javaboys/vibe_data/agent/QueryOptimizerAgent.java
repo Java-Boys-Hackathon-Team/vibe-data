@@ -1,14 +1,23 @@
 package ru.javaboys.vibe_data.agent;
 
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.javaboys.vibe_data.agent.tools.TrinoExplainTools;
 import ru.javaboys.vibe_data.agent.tools.TrinoReadOnlyQueryTools;
+import ru.javaboys.vibe_data.domain.Optimization;
 import ru.javaboys.vibe_data.domain.Task;
 import ru.javaboys.vibe_data.domain.TaskResult;
 import ru.javaboys.vibe_data.domain.jsonb.DdlStatement;
@@ -17,14 +26,8 @@ import ru.javaboys.vibe_data.domain.jsonb.RewrittenQuery;
 import ru.javaboys.vibe_data.domain.jsonb.SqlBlock;
 import ru.javaboys.vibe_data.llm.LlmRequest;
 import ru.javaboys.vibe_data.llm.LlmService;
+import ru.javaboys.vibe_data.repository.OptimizationRepository;
 import ru.javaboys.vibe_data.repository.TaskResultRepository;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -36,6 +39,7 @@ public class QueryOptimizerAgent {
     private final TrinoReadOnlyQueryTools trinoReadOnlyQueryTools;
     private final TaskResultRepository taskResultRepository;
     private final PlatformTransactionManager transactionManager;
+    private final OptimizationRepository optimizationRepository;
 
     public TaskResult optimize(Task task) {
         var payload = task.getInput().getPayload();
@@ -47,12 +51,27 @@ public class QueryOptimizerAgent {
 
         // 1. Системный промпт
         String conversationId = task.getId().toString();
-        String system = PromptTemplates.SYSTEM_ROLE;
+        String system = null;
+        Map<String, Object> sysVars = null;
 
-        Map<String, Object> sysVars = Map.of(
-                "rules", PromptTemplates.RULES,
-                "catalogSchemaRule", PromptTemplates.CATALOG_SCHEMA_RULE
-        );
+        List<Optimization> optimizations = optimizationRepository.findAllByActiveIsTrue();
+        if (optimizations.isEmpty()) {
+            system = PromptTemplates.SYSTEM_ROLE;
+            sysVars = Map.of(
+                    "rules", PromptTemplates.RULES,
+                    "catalogSchemaRule", PromptTemplates.CATALOG_SCHEMA_RULE
+            );
+        } else {
+            String optimizationsLine = optimizations.stream()
+                    .map(Optimization::getText)
+                    .collect(Collectors.joining(System.lineSeparator()));
+            system = PromptTemplates.SYSTEM_ROLE_WIITH_OPTIMIZATIONS;
+            sysVars = Map.of(
+                    "optimizations", optimizationsLine,
+                    "rules", PromptTemplates.RULES,
+                    "catalogSchemaRule", PromptTemplates.CATALOG_SCHEMA_RULE
+            );
+        }
 
         // 2. исходный DDL как контекст
         String originalDdlJoined = payload.getDdl().stream()

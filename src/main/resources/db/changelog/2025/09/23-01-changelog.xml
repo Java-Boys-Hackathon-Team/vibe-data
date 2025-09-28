@@ -92,5 +92,21 @@
                                  constraintName="FK_TASK_RESULT_ON_TASK" referencedColumnNames="id"
                                  referencedTableName="tasks"/>
     </changeSet>
-
+    <changeSet id="1758621206193-10" author="Alex Ianchii">
+        <createTable tableName="optimization">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_optimizations"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="boolean"/>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>
