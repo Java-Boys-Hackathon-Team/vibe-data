@@ -4,7 +4,11 @@ package ru.javaboys.vibe_data.agent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 import ru.javaboys.vibe_data.agent.tools.TrinoExplainTools;
+import ru.javaboys.vibe_data.agent.tools.TrinoReadOnlyQueryTools;
 import ru.javaboys.vibe_data.domain.Task;
 import ru.javaboys.vibe_data.domain.TaskResult;
 import ru.javaboys.vibe_data.domain.jsonb.DdlStatement;
@@ -13,6 +17,7 @@ import ru.javaboys.vibe_data.domain.jsonb.RewrittenQuery;
 import ru.javaboys.vibe_data.domain.jsonb.SqlBlock;
 import ru.javaboys.vibe_data.llm.LlmRequest;
 import ru.javaboys.vibe_data.llm.LlmService;
+import ru.javaboys.vibe_data.repository.TaskResultRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +33,9 @@ public class QueryOptimizerAgent {
 
     private final LlmService llmService;
     private final TrinoExplainTools trinoExplainTools;
+    private final TrinoReadOnlyQueryTools trinoReadOnlyQueryTools;
+    private final TaskResultRepository taskResultRepository;
+    private final PlatformTransactionManager transactionManager;
 
     public TaskResult optimize(Task task) {
         var payload = task.getInput().getPayload();
@@ -86,6 +94,14 @@ public class QueryOptimizerAgent {
                 );
             } catch (Exception e) {
                 log.error("Ошибка оптимизации запроса id={} на итерации {}: {}", q.getQueryid(), idx, e.getMessage(), e);
+                // Перед выбросом ошибки фиксируем накопленные результаты
+                persistToDb(task,
+                        new ArrayList<>(accumulatedDdl),
+                        List.of(),
+                        payload.getQueries().stream()
+                                .map(qq -> optimizedQueries.getOrDefault(qq.getQueryid(),
+                                        RewrittenQuery.builder().queryid(qq.getQueryid()).query(qq.getQuery()).build()))
+                                .toList());
                 throw e;
             }
 
@@ -104,6 +120,16 @@ public class QueryOptimizerAgent {
                     accumulatedDdl.add(SqlBlock.builder().statement(stmt).build());
                 }
             }
+
+            // Промежуточное сохранение прогресса (DDL и Queries), миграции пока пустые
+            TaskResult saved = persistToDb(task,
+                    new ArrayList<>(accumulatedDdl),
+                    List.of(),
+                    payload.getQueries().stream()
+                            .map(qq -> optimizedQueries.getOrDefault(qq.getQueryid(),
+                                    RewrittenQuery.builder().queryid(qq.getQueryid()).query(qq.getQuery()).build()))
+                            .toList());
+            log.info("Итерация {}: промежуточный прогресс сохранён в TaskResult id={}", idx, saved.getId());
         }
 
         // 6. Генерация миграций (финальный шаг)
@@ -137,12 +163,9 @@ public class QueryOptimizerAgent {
                 migrations != null ? migrations.size() : 0,
                 finalQueries != null ? finalQueries.size() : 0);
 
-        return TaskResult.builder()
-                .task(task)
-                .ddl(finalDdl)
-                .migrations(migrations)
-                .queries(finalQueries)
-                .build();
+        // Финальное сохранение результата в БД с немедленной фиксацией
+        TaskResult savedFinal = persistToDb(task, finalDdl, migrations, finalQueries);
+        return savedFinal;
     }
 
     private PerQueryOptimizationOutput runQueryOptimizationStep(
@@ -164,8 +187,8 @@ public class QueryOptimizerAgent {
         userVars.put("queryid", q.getQueryid());
         userVars.put("query_sql", q.getQuery());
 
-        // Tools: отдаём набор инструментов EXPLAIN/ANALYZE
-        List<Object> tools = List.of(trinoExplainTools);
+        // Tools: отдаём набор инструментов EXPLAIN/ANALYZE + чтение read-only
+        List<Object> tools = List.of(trinoExplainTools, trinoReadOnlyQueryTools);
 
         return llmService.callAs(
                 LlmRequest.builder()
@@ -195,7 +218,7 @@ public class QueryOptimizerAgent {
                         .map(SqlBlock::getStatement).collect(Collectors.joining("\n\n"))
         );
 
-        List<Object> tools = List.of(trinoExplainTools);
+        List<Object> tools = List.of(trinoExplainTools, trinoReadOnlyQueryTools);
 
         return llmService.callAs(
                 LlmRequest.builder()
@@ -208,6 +231,33 @@ public class QueryOptimizerAgent {
                         .build(),
                 FinalMigrationOutput.class
         );
+    }
+
+    // Сохранение текущего прогресса в отдельной новой транзакции (мгновенная фиксация)
+    private TaskResult persistToDb(Task task,
+                                   List<SqlBlock> ddl,
+                                   List<SqlBlock> migrations,
+                                   List<RewrittenQuery> queries) {
+        TransactionTemplate tmpl = new TransactionTemplate(transactionManager);
+        tmpl.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        return tmpl.execute(status -> {
+            var existingOpt = taskResultRepository.findByTaskId(task.getId());
+            TaskResult entity = existingOpt.orElseGet(() -> TaskResult.builder()
+                    .task(task)
+                    .ddl(new ArrayList<>())
+                    .migrations(new ArrayList<>())
+                    .queries(new ArrayList<>())
+                    .build());
+
+            // поля не должны быть null
+            entity.setTask(task);
+            entity.setDdl(ddl != null ? ddl : List.of());
+            entity.setMigrations(migrations != null ? migrations : List.of());
+            entity.setQueries(queries != null ? queries : List.of());
+
+            TaskResult saved = taskResultRepository.saveAndFlush(entity);
+            return saved;
+        });
     }
 
     private List<SqlBlock> normalizeDdlOrder(List<String> ddlStatements) {
