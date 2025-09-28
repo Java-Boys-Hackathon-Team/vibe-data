@@ -59,4 +59,45 @@ Authorization: Basic {{username}} {{password}}
 GET http://{{host}}:{{port}}/getresult?task_id={{task_id}}
 Authorization: Basic {{username}} {{password}}
 
-###
+### Optimization create
+POST http://{{host}}:{{port}}/api/v1/optimizations/new
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+
+{
+    "text": "Make the best optimization"
+}
+
+> {%
+    client.test("Accepted 200", function () {
+        client.assert(response.status === 200, "Expected 200");
+    });
+    const body = typeof response.body === 'string' ? JSON.parse(response.body) : response.body;
+    if (body && (body.id || body.id)) {
+        const id = body.id ?? body.id;
+        client.global.set("optimization_id", id);
+        client.log("Stored optimization_id=" + id);
+    } else {
+        client.log("optimization_id not found in response: " + JSON.stringify(body));
+    }
+%}
+
+### Optimization getById
+GET http://{{host}}:{{port}}/api/v1/optimizations/{{optimization_id}}
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+
+### Optimization deactivate
+POST http://{{host}}:{{port}}/api/v1/optimizations/{{optimization_id}}/deactivate
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+
+### Optimization activate
+POST http://{{host}}:{{port}}/api/v1/optimizations/{{optimization_id}}/activate
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+
+### Optimization get
+GET http://{{host}}:{{port}}/api/v1/optimizations
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
