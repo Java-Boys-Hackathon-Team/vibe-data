@@ -53,7 +53,75 @@ services:
     depends_on:
       - vibe-data-db
 
+  minio:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password
+      MINIO_REGION: us-east-1
+      # говорим MinIO, что *.minio — его домены
+      MINIO_DOMAIN: minio
+      MINIO_SERVER_URL: http://minio:9000
+    networks: [ lake-net ]
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: [ "server", "/data", "--console-address", ":9001" ]
+    volumes:
+      - ./data/minio:/data
+
+  iceberg-rest:
+    image: tabulario/iceberg-rest:latest
+    networks: [ lake-net ]
+    environment:
+      # --- конфиг каталога для самого REST-сервиса ---
+      CATALOG_WAREHOUSE: s3://warehouse/
+
+      # >>> принудительно S3FileIO + настройки MinIO <<<
+      CATALOG_IO__IMPL: org.apache.iceberg.aws.s3.S3FileIO
+      CATALOG_S3_ENDPOINT: http://minio:9000
+      CATALOG_S3_PATH__STYLE__ACCESS: "true"
+      CATALOG_S3_REGION: us-east-1
+      CATALOG_S3_SIGNING__REGION: us-east-1
+      CATALOG_S3_ACCESS__KEY__ID: admin
+      CATALOG_S3_SECRET__ACCESS__KEY: password
+      CATALOG_S3_SSL__ENABLED: "false"
+
+      # --- креды для AWS SDK (подхватит S3FileIO как default provider chain) ---
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: admin
+      AWS_SECRET_ACCESS_KEY: password
+
+  trino:
+    image: trinodb/trino:latest
+    depends_on: [ iceberg-rest ]   # можно и убрать, REST нам больше не нужен
+    networks: [ lake-net ]
+    ports: [ "18080:8080" ]
+    environment:
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - JAVA_TOOL_OPTIONS=-Ds3.path-style-access=true -Daws.region=us-east-1
+    volumes:
+      - ./trino-config:/etc/trino:rw
+
+  minio-client:
+    image: minio/mc:latest
+    depends_on: [ minio ]
+    networks: [ lake-net ]
+    entrypoint: >
+      /bin/sh -lc "
+      until (mc alias set minio http://minio:9000 admin password) do echo '...waiting...' && sleep 1; done;
+      mc mb -p minio/warehouse || true;
+      mc anonymous set public minio/warehouse || true;
+      tail -f /dev/null
+      "
+
 volumes:
   postgres_data:
   pgadmin_data:
     driver: local
+
+networks:
+  lake-net:
+    name: lake-net
