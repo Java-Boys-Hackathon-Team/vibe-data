@@ -2,6 +2,7 @@ package ru.javaboys.vibe_data.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import ru.javaboys.vibe_data.service.TaskService;
 
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
@@ -28,9 +30,16 @@ public class TaskController {
 
     @PostMapping("/new")
     public ResponseEntity<NewTaskResponseDto> createTask(@Valid @RequestBody NewTaskRequestDto request) {
-        UUID id = taskService.createTask(request);
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(NewTaskResponseDto.builder().taskid(id).build());
+        log.info("Принят запрос на создание новой задачи");
+        try {
+            UUID id = taskService.createTask(request);
+            log.info("Задача создана, id={}", id);
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(NewTaskResponseDto.builder().taskid(id).build());
+        } catch (Exception e) {
+            log.error("Ошибка при создании задачи: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @GetMapping("/status")

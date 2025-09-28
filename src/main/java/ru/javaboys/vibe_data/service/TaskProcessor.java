@@ -24,25 +24,25 @@ public class TaskProcessor {
     public void processTask(UUID taskId) {
         Task task = taskRepository.findById(taskId).orElse(null);
         if (task == null) {
-            log.warn("Task {} not found for processing", taskId);
+            log.warn("Задача {} не найдена для обработки", taskId);
             return;
         }
         if (task.getStatus() != TaskStatus.RUNNING) {
-            log.info("Task {} is not RUNNING (status={}), skip", taskId, task.getStatus());
+            log.info("Задача {} не в статусе RUNNING (текущий статус={}), пропуск", taskId, task.getStatus());
             return;
         }
 
         try {
-            log.info("Start processing task {}", taskId);
+            log.info("Начинаю обработку задачи {}", taskId);
 
             TaskResult result = optimizerAgent.optimize(task);
             task.setResult(result);
             task.setStatus(TaskStatus.DONE);
 
             taskRepository.save(task);
-            log.info("Task {} processed successfully", taskId);
+            log.info("Задача {} успешно обработана", taskId);
         } catch (Exception e) {
-            log.error("Task {} failed: {}", taskId, e.getMessage(), e);
+            log.error("Ошибка при обработке задачи {}: {}", taskId, e.getMessage(), e);
             task.setStatus(TaskStatus.FAILED);
             task.setError(e.getMessage());
             taskRepository.save(task);

@@ -20,10 +20,10 @@ public class TaskEventsListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void onTaskCreated(TaskCreatedEvent event) {
         try {
-            log.info("Received TaskCreatedEvent for task {}", event.taskId());
+            log.info("Получено событие TaskCreatedEvent для задачи id={}", event.taskId());
             taskProcessor.processTask(event.taskId());
         } catch (Exception e) {
-            log.error("Async processing failed for task {}: {}", event.taskId(), e.getMessage(), e);
+            log.error("Асинхронная обработка задачи id={} завершилась ошибкой: {}", event.taskId(), e.getMessage(), e);
         }
     }
 }
