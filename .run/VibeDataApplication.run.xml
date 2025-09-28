@@ -4,6 +4,7 @@
       <option value="$PROJECT_DIR$/.env" />
     </option>
     <module name="vibe-data.main" />
+    <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=dev" />
     <selectedOptions>
       <option name="environmentVariables" />
     </selectedOptions>
