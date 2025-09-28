@@ -27,6 +27,7 @@ public class TrinoDatasourceConfiguration {
     }
 
     @Bean
+    @ConfigurationProperties("spring.jdbc.template.trino")
     public JdbcTemplate trinoJdbcTemplate(@Qualifier("trinoDataSource") DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }

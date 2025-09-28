@@ -1,15 +1,5 @@
 package ru.javaboys.vibe_data.agent.tools;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -20,6 +10,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import ru.javaboys.vibe_data.dto.MetricInfo;
 
 /**
  * Инструменты для выполнения произвольных read-only SQL-запросов в Trino.
@@ -34,24 +37,25 @@ public class TrinoReadOnlyQueryTools {
     private final ObjectMapper objectMapper;
 
     @Tool(description = "Выполнить read-only SQL-запрос (SELECT/SHOW/DESCRIBE/EXPLAIN/VALUES/WITH/TABLE) в Trino и вернуть результат в JSON.")
-    public String runReadOnlyQuery(
+    public MetricInfo runReadOnlyQuery(
             @ToolParam(description = "SQL-запрос только для чтения. Допустимы SELECT/SHOW/DESCRIBE/EXPLAIN/VALUES/WITH/TABLE.") String sql,
             @ToolParam(description = "Необязательно: лимит количества возвращаемых строк. Если не указан или <=0 — без явного лимита.") Integer maxRows
     ) {
         String sanitized = sanitizeSql(sql);
         if (!isReadOnly(sanitized)) {
-            return "Ошибка: Допускаются только read-only запросы (SELECT/SHOW/DESCRIBE/EXPLAIN/VALUES/WITH/TABLE/WITH).";
+            return MetricInfo.error("Ошибка: Допускаются только read-only запросы (SELECT/SHOW/DESCRIBE/EXPLAIN/VALUES/WITH/TABLE/WITH).");
         }
         if (containsMultipleStatements(sanitized)) {
-            return "Ошибка: Поддерживается только один SQL-стейтмент за вызов (без точек с запятой).";
+            return MetricInfo.error("Ошибка: Поддерживается только один SQL-стейтмент за вызов (без точек с запятой).");
         }
 
         try {
             List<Map<String, Object>> rows = executeQuery(sanitized, maxRows != null && maxRows > 0 ? maxRows : 0);
-            return objectToJson(rows);
+            String json = objectToJson(rows);
+            return MetricInfo.success(json);
         } catch (DataAccessException | SQLException e) {
             log.warn("Ошибка при выполнении read-only запроса в Trino", e);
-            return "Ошибка при выполнении запроса: " + e.getMessage();
+            return MetricInfo.error("Ошибка при выполнении запроса: " + e.getMessage());
         }
     }
 

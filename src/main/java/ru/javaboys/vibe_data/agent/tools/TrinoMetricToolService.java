@@ -1,8 +1,11 @@
 package ru.javaboys.vibe_data.agent.tools;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+import ru.javaboys.vibe_data.dto.MetricInfo;
 
 @Service
 @RequiredArgsConstructor
@@ -12,7 +15,16 @@ public class TrinoMetricToolService {
 
     private final JdbcTemplate trinoJdbcTemplate;
 
-    public String requestExplainInJson(String sql, TrinoExplainType type) {
+    public MetricInfo requestExplainInJson(String sql, TrinoExplainType type) {
+        try {
+            String explain = requestExplainInJsonInternal(sql, type);
+            return MetricInfo.success(explain);
+        } catch (DataAccessException e) {
+            return MetricInfo.error();
+        }
+    }
+
+    private String requestExplainInJsonInternal(String sql, TrinoExplainType type) {
         if (type == TrinoExplainType.ANALYZE || type == TrinoExplainType.ANALYZE_VERBOSE) {
             return trinoJdbcTemplate.queryForObject(
                     String.format(SQL_FORMAT_2, type.getName(), sanitizeSql(sql)),
