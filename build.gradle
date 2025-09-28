@@ -58,6 +58,10 @@ dependencies {
     implementation 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // DDL/SQL Validator dependencies
+    implementation 'io.trino:trino-jdbc:447'
+    implementation 'org.apache.commons:commons-csv:1.11.0'
+
     // Testing
     testImplementation 'io.github.cdimascio:dotenv-java:3.2.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
