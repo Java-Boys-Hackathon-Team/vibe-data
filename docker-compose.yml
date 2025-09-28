@@ -15,6 +15,7 @@ services:
       - PG_DATASOURCE_URL=jdbc:postgresql://vibe-data-db:5432/vibedata
       - PG_NAME=pgadmin
       - PG_PASS=pgadmin
+      - TRINO_QUERY_TIMEOUT=20
     env_file:
       - .env
     extra_hosts:
