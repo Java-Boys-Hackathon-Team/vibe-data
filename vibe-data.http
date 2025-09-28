@@ -1,12 +1,12 @@
 ### Health Check
-GET http://{{host}}:{{port}}/actuator/health
+GET {{baseUrl}}/actuator/health
 Authorization: Basic {{username}} {{password}}
 
 ###
 
 ### Create new task
 # @name newTask
-POST http://{{host}}:{{port}}/new
+POST {{baseUrl}}/new
 Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 
@@ -50,13 +50,13 @@ Content-Type: application/json
 ###
 
 ### Get status
-GET http://{{host}}:{{port}}/status?task_id={{task_id}}
+GET {{baseUrl}}/status?task_id={{task_id}}
 Authorization: Basic {{username}} {{password}}
 
 ###
 
 ### Get result
-GET http://{{host}}:{{port}}/getresult?task_id={{task_id}}
+GET {{baseUrl}}/getresult?task_id={{task_id}}
 Authorization: Basic {{username}} {{password}}
 
 ### Optimization create

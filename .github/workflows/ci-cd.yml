@@ -1,0 +1,56 @@
+name: CI/CD Pipeline for Vibe Data Project
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches:
+      - main
+      - 'feature/**'
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch name to deploy'
+        required: true
+        default: 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Для ручного запуска берём указанную ветку, иначе — реф события (PR/cron)
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Ensure Gradle wrapper is executable
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: |
+          ./gradlew clean bootJar -x test
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: javaboys.ru
+          username: ubuntu
+          port: 50151
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/vibe-data
+            ./deploy.sh ${{ github.event.inputs.branch }}
