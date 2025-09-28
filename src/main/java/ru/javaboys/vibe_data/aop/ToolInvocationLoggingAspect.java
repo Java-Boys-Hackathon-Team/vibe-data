@@ -24,10 +24,9 @@ public class ToolInvocationLoggingAspect {
     private final ObjectMapper objectMapper;
 
     /**
-     * Перехватываем все методы внутри пакета tools, помеченные @Tool (Spring AI).
-     * Важно: точка среза использует и пакет, и аннотацию, чтобы не зацепить "лишнее".
+     * Перехватываем все методы, помеченные @Tool (Spring AI).
      */
-    @Around("within(ru.javaboys.vibe_data.agent.tools..*) && @annotation(org.springframework.ai.tool.annotation.Tool)")
+    @Around("@annotation(org.springframework.ai.tool.annotation.Tool)")
     public Object logToolCall(ProceedingJoinPoint pjp) throws Throwable {
         String toolClass = pjp.getTarget().getClass().getSimpleName();
         String method = pjp.getSignature().getName();
