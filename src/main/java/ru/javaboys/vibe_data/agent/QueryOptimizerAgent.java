@@ -4,7 +4,7 @@ package ru.javaboys.vibe_data.agent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.javaboys.vibe_data.agent.tools.TrinoPlanTools;
+import ru.javaboys.vibe_data.agent.tools.TrinoExplainTools;
 import ru.javaboys.vibe_data.domain.Task;
 import ru.javaboys.vibe_data.domain.TaskResult;
 import ru.javaboys.vibe_data.domain.jsonb.DdlStatement;
@@ -27,10 +27,15 @@ import java.util.stream.Collectors;
 public class QueryOptimizerAgent {
 
     private final LlmService llmService;
-    private final TrinoPlanTools trinoPlanTools;
+    private final TrinoExplainTools trinoExplainTools;
 
     public TaskResult optimize(Task task) {
         var payload = task.getInput().getPayload();
+
+        log.info("Старт оптимизации задачи id={}: входные данные — DDL={}, запросов={}",
+                task.getId(),
+                payload.getDdl() != null ? payload.getDdl().size() : 0,
+                payload.getQueries() != null ? payload.getQueries().size() : 0);
 
         // 1. Системный промпт
         String conversationId = task.getId().toString();
@@ -53,6 +58,7 @@ public class QueryOptimizerAgent {
             long wb = (long) b.getRunquantity() * Math.max(1L, b.getExecutiontime());
             return Long.compare(wb, wa);
         });
+        log.info("Запросов к оптимизации: {}. Запускаем итеративный цикл.", sorted.size());
 
         // 4. копим изменения DDL по шагам
         List<SqlBlock> accumulatedDdl = new ArrayList<>();
@@ -62,20 +68,35 @@ public class QueryOptimizerAgent {
         // 5. Итеративная оптимизация
         for (int i = 0; i < sorted.size(); i++) {
             QueryInput q = sorted.get(i);
-            PerQueryOptimizationOutput out = runQueryOptimizationStep(
-                    conversationId,
-                    system,
-                    sysVars,
-                    originalDdlJoined,
-                    accumulatedDdl,
-                    q
-            );
+            int idx = i + 1;
+            int total = sorted.size();
+            int remaining = total - idx;
+            log.info("Итерация {} из {} (осталось {}): оптимизация запроса id={}, runquantity={}, executiontime={}",
+                    idx, total, remaining, q.getQueryid(), q.getRunquantity(), Math.max(1, q.getExecutiontime()));
+
+            PerQueryOptimizationOutput out;
+            try {
+                out = runQueryOptimizationStep(
+                        conversationId,
+                        system,
+                        sysVars,
+                        originalDdlJoined,
+                        accumulatedDdl,
+                        q
+                );
+            } catch (Exception e) {
+                log.error("Ошибка оптимизации запроса id={} на итерации {}: {}", q.getQueryid(), idx, e.getMessage(), e);
+                throw e;
+            }
 
             // Сохраняем перезаписанный запрос
             optimizedQueries.put(q.getQueryid(), RewrittenQuery.builder()
                     .queryid(q.getQueryid())
                     .query(out.rewrittenQuery())
                     .build());
+
+            int ddlChangesCount = out.ddlChanges() != null ? out.ddlChanges().size() : 0;
+            log.info("Итерация {}: оптимизация запроса id={} завершена, изменений DDL: {}", idx, q.getQueryid(), ddlChangesCount);
 
             // Накапливаем DDL изменения, если пришли
             if (out.ddlChanges() != null && !out.ddlChanges().isEmpty()) {
@@ -86,13 +107,20 @@ public class QueryOptimizerAgent {
         }
 
         // 6. Генерация миграций (финальный шаг)
-        FinalMigrationOutput migrationsOut = runMigrationSynthesis(
-                conversationId,
-                system,
-                sysVars,
-                originalDdlJoined,
-                accumulatedDdl
-        );
+        log.info("Начинаем генерацию миграций и финального DDL. Накоплено изменений DDL: {}", accumulatedDdl.size());
+        FinalMigrationOutput migrationsOut;
+        try {
+            migrationsOut = runMigrationSynthesis(
+                    conversationId,
+                    system,
+                    sysVars,
+                    originalDdlJoined,
+                    accumulatedDdl
+            );
+        } catch (Exception e) {
+            log.error("Ошибка при генерации миграций: {}", e.getMessage(), e);
+            throw e;
+        }
 
         // 7. Сбор финального результата
         List<SqlBlock> finalDdl = normalizeDdlOrder(migrationsOut.newDdl());
@@ -103,6 +131,11 @@ public class QueryOptimizerAgent {
                         // fallback: если по какой-то причине нет оптимизации — вернуть исходный
                         RewrittenQuery.builder().queryid(q.getQueryid()).query(q.getQuery()).build()))
                 .toList();
+
+        log.info("Формирование результата завершено: финальный DDL={}, миграций={}, переписанных запросов={}",
+                finalDdl != null ? finalDdl.size() : 0,
+                migrations != null ? migrations.size() : 0,
+                finalQueries != null ? finalQueries.size() : 0);
 
         return TaskResult.builder()
                 .task(task)
@@ -132,7 +165,7 @@ public class QueryOptimizerAgent {
         userVars.put("query_sql", q.getQuery());
 
         // Tools: отдаём набор инструментов EXPLAIN/ANALYZE
-        List<Object> tools = List.of(trinoPlanTools);
+        List<Object> tools = List.of(trinoExplainTools);
 
         return llmService.callAs(
                 LlmRequest.builder()
@@ -162,7 +195,7 @@ public class QueryOptimizerAgent {
                         .map(SqlBlock::getStatement).collect(Collectors.joining("\n\n"))
         );
 
-        List<Object> tools = List.of(trinoPlanTools);
+        List<Object> tools = List.of(trinoExplainTools);
 
         return llmService.callAs(
                 LlmRequest.builder()
