@@ -8,6 +8,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.javaboys.vibe_data.agent.tools.TrinoExplainTools;
+import ru.javaboys.vibe_data.agent.tools.TrinoReadOnlyQueryTools;
 import ru.javaboys.vibe_data.domain.Task;
 import ru.javaboys.vibe_data.domain.TaskResult;
 import ru.javaboys.vibe_data.domain.jsonb.DdlStatement;
@@ -32,6 +33,7 @@ public class QueryOptimizerAgent {
 
     private final LlmService llmService;
     private final TrinoExplainTools trinoExplainTools;
+    private final TrinoReadOnlyQueryTools trinoReadOnlyQueryTools;
     private final TaskResultRepository taskResultRepository;
     private final PlatformTransactionManager transactionManager;
 
@@ -185,8 +187,8 @@ public class QueryOptimizerAgent {
         userVars.put("queryid", q.getQueryid());
         userVars.put("query_sql", q.getQuery());
 
-        // Tools: отдаём набор инструментов EXPLAIN/ANALYZE
-        List<Object> tools = List.of(trinoExplainTools);
+        // Tools: отдаём набор инструментов EXPLAIN/ANALYZE + чтение read-only
+        List<Object> tools = List.of(trinoExplainTools, trinoReadOnlyQueryTools);
 
         return llmService.callAs(
                 LlmRequest.builder()
@@ -216,7 +218,7 @@ public class QueryOptimizerAgent {
                         .map(SqlBlock::getStatement).collect(Collectors.joining("\n\n"))
         );
 
-        List<Object> tools = List.of(trinoExplainTools);
+        List<Object> tools = List.of(trinoExplainTools, trinoReadOnlyQueryTools);
 
         return llmService.callAs(
                 LlmRequest.builder()
