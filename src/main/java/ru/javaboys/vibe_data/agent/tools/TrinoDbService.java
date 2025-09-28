@@ -1,26 +1,25 @@
 package ru.javaboys.vibe_data.agent.tools;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-
-import lombok.RequiredArgsConstructor;
-import ru.javaboys.vibe_data.dto.MetricInfo;
+import ru.javaboys.vibe_data.dto.TrinoResponse;
 
 @Service
 @RequiredArgsConstructor
-public class TrinoMetricToolService {
+public class TrinoDbService {
     private static final String SQL_FORMAT_1 = "EXPLAIN (TYPE %s, FORMAT JSON) %s";
     private static final String SQL_FORMAT_2 = "EXPLAIN %s %s";
 
     private final JdbcTemplate trinoJdbcTemplate;
 
-    public MetricInfo requestExplainInJson(String sql, TrinoExplainType type) {
+    public TrinoResponse explain(String sql, TrinoExplainType type) {
         try {
             String explain = requestExplainInJsonInternal(sql, type);
-            return MetricInfo.success(explain);
+            return TrinoResponse.success(explain);
         } catch (DataAccessException e) {
-            return MetricInfo.error();
+            return TrinoResponse.error();
         }
     }
 
