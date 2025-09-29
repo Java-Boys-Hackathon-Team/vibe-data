@@ -79,11 +79,17 @@ public class QueryOptimizerAgent {
                 .map(DdlStatement::getStatement)
                 .collect(Collectors.joining("\n\n"));
 
-        // 3. сортировка запросов по весу: runquantity * executiontime (если executiontime==0, считаем 1)
-        List<QueryInput> sorted = new ArrayList<>(payload.getQueries());
+        // 3. удаление дублей по полю QueryInput.query + сортировка по весу
+        List<QueryInput> inputQueries = payload.getQueries();
+        List<QueryInput> unique = dedupeQueriesByText(inputQueries);
+        if (inputQueries != null && unique != null && unique.size() < inputQueries.size()) {
+            log.info("Обнаружены дубли запросов: {} → {} (критерий уникальности — поле query)",
+                    inputQueries.size(), unique.size());
+        }
+        List<QueryInput> sorted = new ArrayList<>(unique);
         sorted.sort((a, b) -> {
-            long wa = (long) a.getRunquantity() * Math.max(1L, a.getExecutiontime());
-            long wb = (long) b.getRunquantity() * Math.max(1L, b.getExecutiontime());
+            long wa = weightOf(a);
+            long wb = weightOf(b);
             return Long.compare(wb, wa);
         });
         log.info("Запросов к оптимизации: {}. Запускаем итеративный цикл.", sorted.size());
@@ -118,7 +124,7 @@ public class QueryOptimizerAgent {
                 persistToDb(task,
                         new ArrayList<>(accumulatedDdl),
                         List.of(),
-                        payload.getQueries().stream()
+                        unique.stream()
                                 .map(qq -> optimizedQueries.getOrDefault(qq.getQueryid(),
                                         RewrittenQuery.builder().queryid(qq.getQueryid()).query(qq.getQuery()).build()))
                                 .toList());
@@ -145,7 +151,7 @@ public class QueryOptimizerAgent {
             TaskResult saved = persistToDb(task,
                     new ArrayList<>(accumulatedDdl),
                     List.of(),
-                    payload.getQueries().stream()
+                    unique.stream()
                             .map(qq -> optimizedQueries.getOrDefault(qq.getQueryid(),
                                     RewrittenQuery.builder().queryid(qq.getQueryid()).query(qq.getQuery()).build()))
                             .toList());
@@ -172,7 +178,7 @@ public class QueryOptimizerAgent {
         List<SqlBlock> finalDdl = normalizeDdlOrder(migrationsOut.newDdl());
         List<SqlBlock> migrations = toSqlBlocks(migrationsOut.migrations());
 
-        List<RewrittenQuery> finalQueries = payload.getQueries().stream()
+        List<RewrittenQuery> finalQueries = unique.stream()
                 .map(q -> optimizedQueries.getOrDefault(q.getQueryid(),
                         // fallback: если по какой-то причине нет оптимизации — вернуть исходный
                         RewrittenQuery.builder().queryid(q.getQueryid()).query(q.getQuery()).build()))
@@ -305,5 +311,28 @@ public class QueryOptimizerAgent {
         return stmts.stream()
                 .map(s -> SqlBlock.builder().statement(s).build())
                 .collect(Collectors.toList());
+    }
+
+    // Вес запроса для сортировки и выбора лучшего дубля
+    private long weightOf(QueryInput q) {
+        if (q == null) return 0L;
+        return (long) q.getRunquantity() * Math.max(1L, q.getExecutiontime());
+    }
+
+    // Удаление дублей по точному совпадению текста запроса (QueryInput.query)
+    // При наличии дублей сохраняем тот, у которого максимальный вес
+    private List<QueryInput> dedupeQueriesByText(List<QueryInput> queries) {
+        if (queries == null || queries.isEmpty()) return List.of();
+        Map<String, QueryInput> bestByQuery = new LinkedHashMap<>();
+        for (QueryInput q : queries) {
+            if (q == null) continue;
+            String key = q.getQuery();
+            if (key == null) continue;
+            QueryInput current = bestByQuery.get(key);
+            if (current == null || weightOf(q) > weightOf(current)) {
+                bestByQuery.put(key, q);
+            }
+        }
+        return new ArrayList<>(bestByQuery.values());
     }
 }
