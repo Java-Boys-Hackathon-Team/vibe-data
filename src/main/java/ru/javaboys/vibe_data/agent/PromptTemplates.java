@@ -65,7 +65,7 @@ public final class PromptTemplates {
             - runquantity: {runquantity}
             - executiontime: {executiontime}
             
-            SQL:
+            SQL-запрос, который нужно оптимизировать:
             {query_sql}
             
             Важно:
