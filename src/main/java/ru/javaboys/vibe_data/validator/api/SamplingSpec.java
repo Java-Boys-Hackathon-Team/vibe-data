@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SamplingSpec {
-    private Double percent; // 0..100 or 0..1 depending on caller; we will assume 0..100
-    private List<LocalDate> dateRange; // [from, to]
+    private Double percent;
+    private List<LocalDate> dateRange;
     private List<String> partitionHints;
 }

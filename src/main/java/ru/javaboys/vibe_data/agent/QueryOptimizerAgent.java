@@ -20,6 +20,9 @@ import ru.javaboys.vibe_data.llm.LlmRequest;
 import ru.javaboys.vibe_data.llm.LlmService;
 import ru.javaboys.vibe_data.repository.OptimizationRepository;
 import ru.javaboys.vibe_data.repository.TaskResultRepository;
+import ru.javaboys.vibe_data.validator.DdlSqlValidator;
+import ru.javaboys.vibe_data.validator.api.SqlFile;
+import ru.javaboys.vibe_data.validator.api.ValidationModels;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +43,7 @@ public class QueryOptimizerAgent {
     private final TrinoReadOnlyQueryTools trinoReadOnlyQueryTools;
     private final TaskResultRepository taskResultRepository;
     private final PlatformTransactionManager transactionManager;
+    private final DdlSqlValidator ddlSqlValidator;
     private final OptimizationRepository optimizationRepository;
 
     public TaskResult optimize(Task task) {
@@ -188,6 +192,13 @@ public class QueryOptimizerAgent {
                 finalDdl != null ? finalDdl.size() : 0,
                 migrations != null ? migrations.size() : 0,
                 finalQueries != null ? finalQueries.size() : 0);
+
+        // 8. Валидация итогового результата
+        var validated = ddlSqlValidator.validateFinalArtifacts(task, finalDdl, migrations, finalQueries);
+
+        finalDdl     = validated.finalDdl();
+        migrations   = validated.migrations();
+        finalQueries = validated.queries();
 
         // Финальное сохранение результата в БД с немедленной фиксацией
         TaskResult savedFinal = persistToDb(task, finalDdl, migrations, finalQueries);
