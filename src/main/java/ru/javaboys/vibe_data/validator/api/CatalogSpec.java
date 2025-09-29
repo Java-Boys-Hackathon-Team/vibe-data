@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CatalogSpec {
-    private String catalog; // e.g., iceberg
-    private String legacySchema; // legacy_public
-    private String nextSchema; // next_public
-    private String sampleSchema; // _sample
+    private String catalog;
+    private String legacySchema;
+    private String nextSchema;
+    private String sampleSchema;
 }

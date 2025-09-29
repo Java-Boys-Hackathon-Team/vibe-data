@@ -87,4 +87,99 @@ public final class PromptTemplates {
             2) Набор SQL миграций INSERT ... SELECT ... для переноса данных из старой структуры в новую. Везде полные имена.
             3) Никаких комментариев, только данные.
             """;
+
+    // ===== Validation autofix prompts =====
+    public static final String VALIDATION_AUTOFIX_SYSTEM = """
+            Ты эксперт по SQL для Trino/Iceberg (Trino + Iceberg + S3).
+            Твоя задача — исполняемо исправить ПРЕДОСТАВЛЕННЫЕ НИЖЕ запросы и DDL, сохраняя их структуру и смысл.
+            НЕЛЬЗЯ упрощать запросы, удалять CTE/подзапросы, менять агрегации и бизнес-логику.
+
+            ОБЯЗАТЕЛЬНО:
+            - Количество запросов в newSql ДОЛЖНО остаться тем же.
+            - Порядок сохранён: newSql[i] — это исправленная версия текущего newSql[i].
+            - Если запрос корректен — верни его без изменений.
+            - Не добавляй «заглушки» вроде SELECT * FROM ...
+            - DDL меняй минимально (пример: корректные свойства/синтаксис партиционирования, кавычки для year/month при необходимости).
+            Верни ТОЛЬКО JSON по схеме (rationale, newDdl, migrations, newSql), без Markdown и без комментариев.
+            """;
+
+    public static String buildValidationAutofixUser(
+            int attempt,
+            String prodJdbcUrl,
+            String errorsBlock,
+            int newDdlCount, String newDdl,
+            int migCount, String migrations,
+            int newSqlCount, String newSql
+    ) {
+        return ("""
+            Попытка: %d
+            PROD JDBC: %s
+
+            Ошибки валидации:
+            %s
+
+            NEW DDL (%d шт):
+            %s
+
+            MIGRATIONS (%d шт):
+            %s
+
+            NEW SQL (%d шт, по порядку):
+            %s
+
+            Требования к ответу:
+            - Верни JSON с полями: rationale, newDdl, migrations, newSql.
+            - Размер newSql ДОЛЖЕН быть ровно %d (как сейчас), порядок сохранён.
+            - Вноси только минимальные правки, чтобы всё выполнялось.
+            - Формат ответа: строгий RFC8259 JSON, без Markdown-блоков и лишнего текста.
+            """).formatted(
+                attempt,
+                String.valueOf(prodJdbcUrl),
+                errorsBlock == null ? "—" : errorsBlock,
+                newDdlCount, newDdl == null ? "" : newDdl,
+                migCount, migrations == null ? "" : migrations,
+                newSqlCount, newSql == null ? "" : newSql,
+                newSqlCount
+        );
+    }
+
+    public static String buildValidationExceptionUser(
+            int attempt,
+            String shortError,
+            String prodJdbcUrl,
+            int newDdlCount, String newDdl,
+            int migCount, String migrations,
+            int newSqlCount, String newSql
+    ) {
+        return ("""
+            Попытка: %d
+            Ошибка (коротко): %s
+
+            Контекст:
+            - prodTrinoJdbcUrl: %s
+
+            NEW DDL (%d шт):
+            %s
+
+            MIGRATIONS (%d шт):
+            %s
+
+            NEW SQL (%d шт, по порядку):
+            %s
+
+            Требования к ответу:
+            - Верни JSON с полями: rationale, newDdl, migrations, newSql.
+            - Размер newSql ДОЛЖЕН быть ровно %d (как сейчас), порядок сохранён.
+            - Вноси только минимальные правки, чтобы всё выполнялось.
+            - Формат ответа: строгий RFC8259 JSON, без Markdown-блоков и лишнего текста.
+            """).formatted(
+                attempt,
+                String.valueOf(shortError),
+                String.valueOf(prodJdbcUrl),
+                newDdlCount, newDdl == null ? "" : newDdl,
+                migCount, migrations == null ? "" : migrations,
+                newSqlCount, newSql == null ? "" : newSql,
+                newSqlCount
+        );
+    }
 }
