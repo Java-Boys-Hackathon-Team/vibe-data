@@ -59,7 +59,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     // DDL/SQL Validator dependencies
-    implementation 'io.trino:trino-jdbc:447'
     implementation 'org.apache.commons:commons-csv:1.11.0'
 
     // Testing
