@@ -21,8 +21,6 @@ import ru.javaboys.vibe_data.llm.LlmService;
 import ru.javaboys.vibe_data.repository.OptimizationRepository;
 import ru.javaboys.vibe_data.repository.TaskResultRepository;
 import ru.javaboys.vibe_data.validator.DdlSqlValidator;
-import ru.javaboys.vibe_data.validator.api.SqlFile;
-import ru.javaboys.vibe_data.validator.api.ValidationModels;
 
 import java.util.ArrayList;
 import java.util.HashMap;
