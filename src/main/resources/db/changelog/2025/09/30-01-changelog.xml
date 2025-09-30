@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1759252733118-2" author="zen (generated)">
+        <createTable tableName="method_stats">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_method_stats"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stats_key" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="avg_time_ms" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_count" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="success_count" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="error_count" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1759252733118-3" author="zen (generated)">
+        <addUniqueConstraint columnNames="stats_key" constraintName="UC_METHOD_STATS_STATS_KEY"
+                             tableName="method_stats"/>
+    </changeSet>
+    <changeSet id="1759252733118-4" author="zen (generated)">
+        <createIndex indexName="ux_method_stats_key" tableName="method_stats" unique="true">
+            <column name="stats_key"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1759252733118-1" author="zen (generated)">
+        <addDefaultValue columnDataType="boolean" columnName="active" defaultValueBoolean="true"
+                         tableName="optimization"/>
+    </changeSet>
+
+</databaseChangeLog>
