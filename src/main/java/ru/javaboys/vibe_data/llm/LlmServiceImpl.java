@@ -11,6 +11,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.stereotype.Service;
+import ru.javaboys.vibe_data.monitoring.Monitored;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ public class LlmServiceImpl implements LlmService {
 
     private final ChatClient chatClient;
 
+    @Monitored(key = "llm.call")
     @Override
     public String call(LlmRequest request) {
 
@@ -32,6 +34,7 @@ public class LlmServiceImpl implements LlmService {
                 .content();
     }
 
+    @Monitored(key = "llm.call.as")
     @Override
     public <T> T callAs(LlmRequest request, Class<T> classType) {
 
