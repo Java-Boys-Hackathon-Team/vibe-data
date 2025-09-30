@@ -194,8 +194,8 @@ public class QueryOptimizerAgent {
         // 8. Валидация итогового результата
         var validated = ddlSqlValidator.validateFinalArtifacts(task, finalDdl, migrations, finalQueries);
 
-        finalDdl     = validated.finalDdl();
-        migrations   = validated.migrations();
+        finalDdl = validated.finalDdl();
+        migrations = validated.migrations();
         finalQueries = validated.queries();
 
         // Финальное сохранение результата в БД с немедленной фиксацией

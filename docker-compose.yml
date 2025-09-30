@@ -8,6 +8,7 @@ services:
       - ./sources:/app/sources
     restart: always
     container_name: vibe-data
+    networks: [ lake-net ]
     ports:
       - "8086:8080"
     environment:
@@ -16,6 +17,8 @@ services:
       - PG_NAME=pgadmin
       - PG_PASS=pgadmin
       - TRINO_QUERY_TIMEOUT=20
+      - VALIDATION_MAX_ATTEMPTS=10
+      - TRINO_JDBC_URL=jdbc:trino://vibe-data-trino-1:8080/iceberg
     env_file:
       - .env
     extra_hosts:
@@ -30,6 +33,7 @@ services:
       context: postgres
     restart: always
     container_name: vibe-data-db
+    networks: [ lake-net ]
     ports:
       - "25436:5432"
     volumes:
@@ -43,6 +47,7 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     restart: always
+    networks: [ lake-net ]
     environment:
       PGADMIN_DEFAULT_EMAIL: "kuramshin.py@yandex.ru"
       PGADMIN_DEFAULT_PASSWORD: "admin"
