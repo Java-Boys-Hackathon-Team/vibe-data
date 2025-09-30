@@ -29,6 +29,12 @@ import lombok.ToString;
        })
 public class Task extends BaseEntity {
 
+    @Column(name = "llm_model", columnDefinition = "VARCHAR(64)")
+    private String llmModel;
+
+    @Column(name = "temperature", columnDefinition = "DOUBLE")
+    private Double temperature;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)
     private TaskStatus status;

@@ -1,8 +1,7 @@
 package ru.javaboys.vibe_data.api;
 
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,14 +10,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.javaboys.vibe_data.api.dto.NewTaskRequestDto;
 import ru.javaboys.vibe_data.api.dto.NewTaskResponseDto;
 import ru.javaboys.vibe_data.api.dto.ResultResponseDto;
 import ru.javaboys.vibe_data.api.dto.StatusResponseDto;
+import ru.javaboys.vibe_data.config.LlmProperties;
 import ru.javaboys.vibe_data.domain.TaskStatus;
 import ru.javaboys.vibe_data.service.TaskService;
-
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -26,11 +28,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TaskController {
 
+    private final LlmProperties llmProperties;
     private final TaskService taskService;
 
     @PostMapping("/new")
     public ResponseEntity<NewTaskResponseDto> createTask(@Valid @RequestBody NewTaskRequestDto request) {
         log.info("Принят запрос на создание новой задачи");
+
+        if (request.getLlmModel() != null
+            && !llmProperties.getValidModels().contains(request.getLlmModel())) {
+            throw new IllegalArgumentException("Invalid model name, valid model names: " + llmProperties.getValidModels());
+        }
+
         try {
             UUID id = taskService.createTask(request);
             log.info("Задача создана, id={}", id);

@@ -1,11 +1,16 @@
 package ru.javaboys.vibe_data.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
+import java.util.UUID;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.javaboys.vibe_data.api.dto.NewTaskRequestDto;
 import ru.javaboys.vibe_data.api.dto.ResultResponseDto;
 import ru.javaboys.vibe_data.domain.Task;
@@ -16,10 +21,6 @@ import ru.javaboys.vibe_data.event.TaskCreatedEvent;
 import ru.javaboys.vibe_data.mapper.TaskInputPayloadMapper;
 import ru.javaboys.vibe_data.mapper.TaskResultMapper;
 import ru.javaboys.vibe_data.repository.TaskRepository;
-
-import java.util.UUID;
-
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 
 @Slf4j
@@ -40,6 +41,8 @@ public class TaskServiceImpl implements TaskService {
                 request.getQueries() != null ? request.getQueries().size() : 0);
 
         Task task = Task.builder()
+                .llmModel(request.getLlmModel())
+                .temperature(request.getTemperature())
                 .status(TaskStatus.RUNNING)
                 .build();
 

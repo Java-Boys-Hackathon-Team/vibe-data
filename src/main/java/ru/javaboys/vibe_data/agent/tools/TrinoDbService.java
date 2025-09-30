@@ -1,11 +1,14 @@
 package ru.javaboys.vibe_data.agent.tools;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.javaboys.vibe_data.dto.TrinoResponse;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TrinoDbService {
@@ -19,6 +22,7 @@ public class TrinoDbService {
             String explain = requestExplainInJsonInternal(sql, type);
             return TrinoResponse.success(explain);
         } catch (DataAccessException e) {
+            log.warn("Ошибка при выполнении read-only запроса в Trino", e);
             return TrinoResponse.error();
         }
     }
