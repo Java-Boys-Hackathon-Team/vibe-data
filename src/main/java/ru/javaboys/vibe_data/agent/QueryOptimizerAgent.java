@@ -1,12 +1,21 @@
 package ru.javaboys.vibe_data.agent;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.javaboys.vibe_data.agent.tools.TrinoExplainTools;
 import ru.javaboys.vibe_data.agent.tools.TrinoReadOnlyQueryTools;
 import ru.javaboys.vibe_data.domain.Optimization;
@@ -21,15 +30,6 @@ import ru.javaboys.vibe_data.llm.LlmService;
 import ru.javaboys.vibe_data.repository.OptimizationRepository;
 import ru.javaboys.vibe_data.repository.TaskResultRepository;
 import ru.javaboys.vibe_data.validator.DdlSqlValidator;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -113,6 +113,8 @@ public class QueryOptimizerAgent {
             PerQueryOptimizationOutput out;
             try {
                 out = runQueryOptimizationStep(
+                        task.getLlmModel(),
+                        task.getTemperature(),
                         conversationId,
                         system,
                         sysVars,
@@ -204,6 +206,8 @@ public class QueryOptimizerAgent {
     }
 
     private PerQueryOptimizationOutput runQueryOptimizationStep(
+            String llmModel,
+            Double temperature,
             String conversationId,
             String system,
             Map<String, Object> sysVars,
@@ -227,6 +231,8 @@ public class QueryOptimizerAgent {
 
         return llmService.callAs(
                 LlmRequest.builder()
+                        .llmModel(llmModel)
+                        .temperature(temperature)
                         .conversationId(conversationId)
                         .systemMessage(system)
                         .systemVariables(sysVars)

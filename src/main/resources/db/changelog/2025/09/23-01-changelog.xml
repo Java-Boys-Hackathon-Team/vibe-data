@@ -109,4 +109,10 @@
             <column name="active" type="boolean"/>
         </createTable>
     </changeSet>
+    <changeSet id="1758621206193-11" author="Alex Ianchii">
+        <addColumn tableName="tasks">
+            <column name="llm_model" type="VARCHAR(64)"/>
+            <column name="temperature" type="DOUBLE"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

@@ -1,7 +1,9 @@
 package ru.javaboys.vibe_data.llm;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
@@ -10,16 +12,19 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import ru.javaboys.vibe_data.config.LlmProperties;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class LlmServiceImpl implements LlmService {
 
+    private final LlmProperties llmProperties;
     private final ChatClient chatClient;
 
     @Override
@@ -71,7 +76,11 @@ public class LlmServiceImpl implements LlmService {
             messages.add(userMsg);
         }
 
-        Prompt prompt = new Prompt(messages);
+        OpenAiChatOptions options = OpenAiChatOptions.builder()
+                .model(Objects.requireNonNullElse(request.getLlmModel(), llmProperties.getLlmModel()))
+                .temperature(Objects.requireNonNullElse(request.getTemperature(), llmProperties.getTemperature()))
+                .build();
+        Prompt prompt = new Prompt(messages, options);
 
         var chatClientRequestSpec = chatClient.prompt(prompt);
 
