@@ -1,4 +1,4 @@
-package ru.javaboys.vibe_data.validator.api;
+package ru.javaboys.vibe_data.validator.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Data;

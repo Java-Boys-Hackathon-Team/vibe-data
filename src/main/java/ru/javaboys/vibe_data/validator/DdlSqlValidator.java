@@ -13,8 +13,8 @@ import ru.javaboys.vibe_data.domain.jsonb.RewrittenQuery;
 import ru.javaboys.vibe_data.domain.jsonb.SqlBlock;
 import ru.javaboys.vibe_data.llm.LlmRequest;
 import ru.javaboys.vibe_data.llm.LlmService;
-import ru.javaboys.vibe_data.validator.api.SqlFile;
-import ru.javaboys.vibe_data.validator.api.ValidationModels;
+import ru.javaboys.vibe_data.validator.dto.SqlFile;
+import ru.javaboys.vibe_data.validator.dto.ValidationModels;
 import ru.javaboys.vibe_data.agent.PromptTemplates;
 import ru.javaboys.vibe_data.dto.AutoFixOutput;
 import ru.javaboys.vibe_data.dto.ValidationPatch;
@@ -63,6 +63,9 @@ public class DdlSqlValidator {
     @Value("${trino.local.catalog}")
     private String localCatalogName;
 
+    @Value("${validation.max-attempts}")
+    private int maxValidationAttempts;
+
     private final LlmService llmService;
 
     public DdlSqlValidator(@Qualifier("trinoLocalJdbcTemplate") JdbcTemplate localTrino, LlmService llmService) {
@@ -82,6 +85,10 @@ public class DdlSqlValidator {
     ) {
         var payload = task.getInput().getPayload();
 
+        final List<String> originalQueryIds = payload.getQueries() == null
+                ? List.of()
+                : payload.getQueries().stream().map(QueryInput::getQueryid).toList();
+
         ValidationModels.ValidationRequest vreq = ValidationModels.ValidationRequest.builder()
                 .prodTrinoJdbcUrl(payload.getUrl())
                 .oldDdl(toSqlFiles(payload.getDdl().stream().map(DdlStatement::getStatement).toList()))
@@ -93,22 +100,22 @@ public class DdlSqlValidator {
 
         ValidationModels.ValidationReport vrep = null;
 
-        for (int attempt = 1; attempt <= 3; attempt++) {
+        for (int attempt = 1; attempt <= maxValidationAttempts; attempt++) {
             try {
                 vrep = run(vreq);
 
                 if (vrep.getStatus() == ValidationModels.ValidationStatus.OK) {
-                    log.info("Validation succeeded on attempt {}", attempt);
+                    log.info("Validation succeeded on attempt {} (maxAttempts={})", attempt, maxValidationAttempts);
+                    finalQueries = ensureQueryIds(finalQueries, originalQueryIds);
                     return new ValidatedArtifacts(finalDdl, migrations, finalQueries, vrep);
                 }
 
-                // Есть структурированные ошибки — отправим их в LLM и попробуем автоисправление
-                log.warn("Validation attempt {} finished with ERROR ({} issues)", attempt, vrep.getErrors().size());
+                log.warn("Validation attempt {} of {} finished with ERROR ({} issues)",
+                        attempt, maxValidationAttempts, vrep.getErrors().size());
 
-                var patch = sendValidationErrorsToLlm(task, vreq, vrep.getErrors(), attempt); // ваш существующий метод-обёртка
+                var patch = sendValidationErrorsToLlm(task, vreq, vrep.getErrors(), attempt);
 
                 if (patch != null) {
-                    // Применяем патч: LLM мог вернуть новые DDL/миграции/SQL
                     if (patch.getNewDdl() != null && !patch.getNewDdl().isEmpty()) {
                         finalDdl = toSqlBlocks(patch.getNewDdl());
                     }
@@ -116,12 +123,11 @@ public class DdlSqlValidator {
                         migrations = toSqlBlocks(patch.getMigrations());
                     }
                     if (patch.getNewSql() != null && !patch.getNewSql().isEmpty()) {
-                        finalQueries = patch.getNewSql().stream()
-                                .map(sql -> RewrittenQuery.builder().queryid(null).query(sql).build())
-                                .toList();
+                        finalQueries = mapSqlToRewrittenWithIds(patch.getNewSql(), originalQueryIds);
+                        // NOTE: здесь мы получили новые запросы от автофикса — обновляем то, что собрали на предыдущих стадиях
+                        // (оставлено комментариями как вы просили)
                     }
 
-                    // Пересобираем запрос на валидацию после автоисправлений
                     vreq = ValidationModels.ValidationRequest.builder()
                             .prodTrinoJdbcUrl(resolveProdJdbcUrl(task))
                             .oldDdl(toSqlFiles(payload.getDdl().stream().map(DdlStatement::getStatement).toList()))
@@ -131,21 +137,21 @@ public class DdlSqlValidator {
                             .newSql(toSqlFiles(finalQueries.stream().map(RewrittenQuery::getQuery).toList()))
                             .build();
 
-                    // продолжаем цикл (следующая попытка)
                     continue;
                 }
 
-                // Нечего применить — считаем попытку неуспешной
-                if (attempt == 3) {
+                if (attempt == maxValidationAttempts) {
                     log.error("Validation failed after {} attempts (no applicable patch)", attempt);
+                    finalQueries = ensureQueryIds(finalQueries, originalQueryIds);
                     return new ValidatedArtifacts(finalDdl, migrations, finalQueries, vrep);
                 }
 
             } catch (Exception e) {
-                // airbag на случай непредвиденного исключения
                 sendValidationErrorsToLlm(task, vreq, e, attempt);
-                if (attempt == 3) {
-                    log.error("Validation failed after {} attempts due to unexpected exception", attempt, e);
+                if (attempt == maxValidationAttempts) {
+                    log.error("Validation failed after {} attempts due to unexpected exception (maxAttempts={})",
+                            attempt, maxValidationAttempts, e);
+                    finalQueries = ensureQueryIds(finalQueries, originalQueryIds);
                     throw e;
                 }
             }
@@ -898,7 +904,7 @@ public class DdlSqlValidator {
         String system = PromptTemplates.VALIDATION_AUTOFIX_SYSTEM;
 
         int newDdlCount = req.getNewDdl() != null ? req.getNewDdl().size() : 0;
-        int migCount    = req.getMigrations() != null ? req.getMigrations().size() : 0;
+        int migCount = req.getMigrations() != null ? req.getMigrations().size() : 0;
         int newSqlCount = req.getNewSql() != null ? req.getNewSql().size() : 0;
 
         String errorsBlock = (errors == null || errors.isEmpty())
@@ -913,7 +919,7 @@ public class DdlSqlValidator {
                 String.valueOf(req.getProdTrinoJdbcUrl()),
                 errorsBlock,
                 newDdlCount, joinSqlFiles("NEW_DDL", req.getNewDdl()),
-                migCount,    joinSqlFiles("MIGRATIONS", req.getMigrations()),
+                migCount, joinSqlFiles("MIGRATIONS", req.getMigrations()),
                 newSqlCount, joinSqlFiles("NEW_SQL", req.getNewSql())
         );
 
@@ -967,7 +973,7 @@ public class DdlSqlValidator {
         String system = PromptTemplates.VALIDATION_AUTOFIX_SYSTEM;
 
         int newDdlCount = req.getNewDdl() != null ? req.getNewDdl().size() : 0;
-        int migCount    = req.getMigrations() != null ? req.getMigrations().size() : 0;
+        int migCount = req.getMigrations() != null ? req.getMigrations().size() : 0;
         int newSqlCount = req.getNewSql() != null ? req.getNewSql().size() : 0;
 
         String user = PromptTemplates.buildValidationExceptionUser(
@@ -975,7 +981,7 @@ public class DdlSqlValidator {
                 String.valueOf(error.getMessage()),
                 String.valueOf(req.getProdTrinoJdbcUrl()),
                 newDdlCount, joinSqlFiles("NEW_DDL", req.getNewDdl()),
-                migCount,    joinSqlFiles("MIGRATIONS", req.getMigrations()),
+                migCount, joinSqlFiles("MIGRATIONS", req.getMigrations()),
                 newSqlCount, joinSqlFiles("NEW_SQL", req.getNewSql())
         );
 
@@ -1019,7 +1025,9 @@ public class DdlSqlValidator {
         return sb.toString();
     }
 
-    /** Откуда берём JDBC URL PROD Trino. При необходимости замени на конфиг. */
+    /**
+     * Откуда берём JDBC URL PROD Trino. При необходимости замени на конфиг.
+     */
     protected String resolveProdJdbcUrl(Task task) {
         try {
             String url = task.getInput().getPayload().getUrl();
@@ -1042,5 +1050,36 @@ public class DdlSqlValidator {
     private static String stripTrailingSemicolon(String sql) {
         if (sql == null) return null;
         return sql.replaceFirst(";\\s*$", "");
+    }
+
+    private List<RewrittenQuery> mapSqlToRewrittenWithIds(List<String> newSql, List<String> originalIds) {
+        List<RewrittenQuery> out = new ArrayList<>(newSql.size());
+        for (int i = 0; i < newSql.size(); i++) {
+            String sql = newSql.get(i);
+            String id = (i < originalIds.size() && !isBlank(originalIds.get(i)))
+                    ? originalIds.get(i)
+                    : "autofix-" + java.util.UUID.randomUUID();
+            out.add(RewrittenQuery.builder().queryid(id).query(sql).build());
+        }
+        if (newSql.size() != originalIds.size()) {
+            log.warn("New SQL count ({}) differs from original IDs ({}). Mapped by position; extras filled with generated ids.",
+                    newSql.size(), originalIds.size());
+        }
+        return out;
+    }
+
+    private List<RewrittenQuery> ensureQueryIds(List<RewrittenQuery> queries, List<String> originalIds) {
+        if (queries == null) return List.of();
+        List<RewrittenQuery> out = new ArrayList<>(queries.size());
+        for (int i = 0; i < queries.size(); i++) {
+            RewrittenQuery q = queries.get(i);
+            String id = (q.getQueryid() != null && !q.getQueryid().isBlank())
+                    ? q.getQueryid()
+                    : (i < originalIds.size() && !isBlank(originalIds.get(i)))
+                    ? originalIds.get(i)
+                    : "autofix-" + java.util.UUID.randomUUID();
+            out.add(RewrittenQuery.builder().queryid(id).query(q.getQuery()).build());
+        }
+        return out;
     }
 }
