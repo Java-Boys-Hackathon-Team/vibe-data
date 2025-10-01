@@ -42,6 +42,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.liquibase:liquibase-core'
     implementation 'io.trino:trino-jdbc:468'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
 
     // Spring AI
     implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
