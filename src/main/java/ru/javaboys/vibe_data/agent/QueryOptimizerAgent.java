@@ -21,7 +21,7 @@ import ru.javaboys.vibe_data.llm.LlmService;
 import ru.javaboys.vibe_data.monitoring.MethodStatsRepository;
 import ru.javaboys.vibe_data.repository.OptimizationRepository;
 import ru.javaboys.vibe_data.repository.TaskResultRepository;
-import ru.javaboys.vibe_data.validator.DdlSqlValidator;
+import ru.javaboys.vibe_data.validator.ValidationSwitcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,8 +43,8 @@ public class QueryOptimizerAgent {
     private final TrinoReadOnlyQueryTools trinoReadOnlyQueryTools;
     private final TaskResultRepository taskResultRepository;
     private final PlatformTransactionManager transactionManager;
-    private final DdlSqlValidator ddlSqlValidator;
     private final OptimizationRepository optimizationRepository;
+    private final ValidationSwitcher validationSwitcher;
 
     // --- Time-budget configuration ---
     private final MethodStatsRepository methodStatsRepository;
@@ -228,7 +228,6 @@ public class QueryOptimizerAgent {
 
         List<RewrittenQuery> finalQueries = unique.stream()
                 .map(q -> optimizedQueries.getOrDefault(q.getQueryid(),
-                        // fallback: если по какой-то причине нет оптимизации — вернуть исходный
                         RewrittenQuery.builder().queryid(q.getQueryid()).query(q.getQuery()).build()))
                 .toList();
 
@@ -238,7 +237,7 @@ public class QueryOptimizerAgent {
                 finalQueries != null ? finalQueries.size() : 0);
 
         // 8. Валидация итогового результата
-        var validated = ddlSqlValidator.validateFinalArtifacts(task, finalDdl, migrations, finalQueries);
+        var validated = validationSwitcher.validate(task, finalDdl, migrations, finalQueries);
 
         finalDdl = validated.finalDdl();
         migrations = validated.migrations();

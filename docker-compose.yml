@@ -19,6 +19,7 @@ services:
       - TRINO_QUERY_TIMEOUT=20
       - VALIDATION_MAX_ATTEMPTS=3
       - TRINO_JDBC_URL=jdbc:trino://vibe-data-trino-1:8080/iceberg
+      - VALIDATION_ENABLED=true
     env_file:
       - .env
     extra_hosts:
