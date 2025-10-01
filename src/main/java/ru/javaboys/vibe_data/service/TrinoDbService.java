@@ -28,9 +28,7 @@ public class TrinoDbService {
     public TrinoResponse explain(String sql, TrinoExplainType type) {
         log.info("Executing explain request for type: {} and SQL: {}", type, sql);
         try {
-            long startAt = System.currentTimeMillis();
             String explain = requestExplainInJsonInternal(sql, type);
-            log.info("Explain request took {} ms", System.currentTimeMillis() - startAt);
             return TrinoResponse.success(explain);
         } catch (DataAccessException e) {
             log.warn("Ошибка при выполнении read-only запроса в Trino", e);
