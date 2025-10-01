@@ -123,7 +123,29 @@ services:
       tail -f /dev/null
       "
 
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    command: [
+      "redis-server",
+      "--requirepass", "redisadmin",
+      "--appendonly", "yes",
+      "--maxmemory-policy", "allkeys-lru"
+    ]
+    ports:
+      - "26379:6379"
+    environment:
+      REDIS_PASSWORD: redisadmin
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a redisadmin ping | grep PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
 volumes:
+  redis_data:
   postgres_data:
   pgadmin_data:
     driver: local

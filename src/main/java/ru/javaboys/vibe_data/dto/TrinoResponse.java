@@ -1,11 +1,13 @@
 package ru.javaboys.vibe_data.dto;
 
+import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.ToString;
 
 @Getter
 @ToString
-public class TrinoResponse {
+public class TrinoResponse implements Serializable {
     private static final String ERROR_MESSAGE = "Ошибка получения информации";
     private final String response;
     private final String error;

@@ -1,11 +1,13 @@
 package ru.javaboys.vibe_data.agent.tools;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.javaboys.vibe_data.dto.TrinoResponse;
+import ru.javaboys.vibe_data.service.TrinoDbService;
 
 /**
  * Набор инструментов, доступных LLM через Tool Calling (Spring AI Function Calling).
