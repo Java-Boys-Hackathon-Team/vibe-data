@@ -162,29 +162,50 @@ Java 21, Spring Boot 3, Spring AI, PostgreSQL, Docker, Trino JDBC, Redis, MinIO.
 
 ```mermaid
 erDiagram
-    TASKS {
+    tasks {
         uuid id PK
+        timestamp created_at
+        timestamp updated_at
+        varchar(64) llm_model
+        double temperature
         enum status
         text error
     }
-    TASK_INPUT {
+    task_input {
         uuid id PK
+        timestamp created_at
+        timestamp updated_at
+        uuid task_id FK
         jsonb payload
     }
-    TASK_RESULT {
+    task_result {
         uuid id PK
+        timestamp created_at
+        timestamp updated_at
+        uuid task_id FK
         jsonb ddl
         jsonb migrations
         jsonb queries
     }
-    OPTIMIZATIONS {
+    optimization {
         uuid id PK
+        timestamp created_at
+        timestamp updated_at
         text text
         boolean active
     }
-    TASKS ||--|| TASK_INPUT: has_input
-    TASKS ||--o| TASK_RESULT: has_result
-    OPTIMIZATIONS ||--o| TASKS: affects
+    method_stats {
+        uuid id PK
+        timestamp created_at
+        timestamp updated_at
+        varchar(255) stats_key
+        double avg_time_ms
+        bigint total_count
+        bigint success_count
+        bigint error_count
+    }
+    tasks ||--|| task_input : has_input
+    tasks ||--o| task_result : has_result
 ```
 
 ---
@@ -208,7 +229,7 @@ erDiagram
 ## Запуск локально (docker-compose)
 
 ```bash
-docker compose up -d --build
+docker compose up -d
 ```
 
 Доступ к сервисам:
@@ -238,7 +259,6 @@ docker compose up -d --build
 
 * `validation.enabled` — включить/выключить валидацию
 * `validation.max-attempts` — число авто-попыток (по умолчанию 3)
-* `trino.local.catalog` — локальный каталог (по умолчанию iceberg)
 
 **Тайм-менеджмент:**
 
@@ -291,17 +311,3 @@ docker compose up -d --build
 OPENAI_API_KEY=sk-...your_key...
 BASIC_AUTH_USERNAME=javaboys
 BASIC_AUTH_PASSWORD=change_me
-
-# опциональные (раскомментируйте и измените при необходимости)
-# TRINO_QUERY_TIMEOUT=20
-# LLM_TIMEOUT_SECONDS=60
-# VALIDATION_ENABLED=true
-# VALIDATION_MAX_ATTEMPTS=3
-# PROCESSING_MAX_TOTAL_MS=900000
-# PROCESSING_DEFAULT_LLM_MS=40000
-```
-
-Советы по безопасности:
-
-- Не храните реальные ключи в публичных репозиториях. Добавьте .env в .gitignore при разработке.
-- Для применения изменений перезапустите сервис: docker compose up -d (или пересоберите при изменениях кода: docker compose up -d --build).
