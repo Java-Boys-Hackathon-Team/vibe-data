@@ -43,7 +43,7 @@ public class TaskProcessor {
         try {
             log.info("Начинаю обработку задачи {}", taskId);
 
-            Thread.ofPlatform().name("cache-heater").start(() -> {
+            Thread.ofPlatform().name("cache-filler").start(() -> {
                 runSqlCacheProcess(task);
             });
 

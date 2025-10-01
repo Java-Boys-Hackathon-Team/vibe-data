@@ -78,7 +78,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public ResultResponseDto getResult(UUID taskId) {
         log.info("Запрошен результат задачи id={}", taskId);
-        Task task = taskRepository.findById(taskId)
+        Task task = taskRepository.findByIdAndStatusIs(taskId, TaskStatus.DONE)
                 .orElseThrow(() -> {
                     log.error("Задача id={} не найдена", taskId);
                     return new ResponseStatusException(NOT_FOUND, "Задача не найдена");
