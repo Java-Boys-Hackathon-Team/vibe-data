@@ -150,10 +150,7 @@ public class QueryOptimizerAgent {
                 persistToDb(task,
                         new ArrayList<>(accumulatedDdl),
                         List.of(),
-                        unique.stream()
-                                .map(qq -> optimizedQueries.getOrDefault(qq.getQueryid(),
-                                        RewrittenQuery.builder().queryid(qq.getQueryid()).query(qq.getQuery()).build()))
-                                .toList());
+                        new ArrayList<>(optimizedQueries.values()));
                 throw e;
             }
 
@@ -177,10 +174,7 @@ public class QueryOptimizerAgent {
             TaskResult saved = persistToDb(task,
                     new ArrayList<>(accumulatedDdl),
                     List.of(),
-                    unique.stream()
-                            .map(qq -> optimizedQueries.getOrDefault(qq.getQueryid(),
-                                    RewrittenQuery.builder().queryid(qq.getQueryid()).query(qq.getQuery()).build()))
-                            .toList());
+                    new ArrayList<>(optimizedQueries.values()));
             log.info("Итерация {}: промежуточный прогресс сохранён в TaskResult id={}", idx, saved.getId());
 
             // --- Проверка бюджета времени: хватит ли на обязательные шаги? ---
@@ -226,10 +220,7 @@ public class QueryOptimizerAgent {
         List<SqlBlock> finalDdl = normalizeDdlOrder(migrationsOut.newDdl());
         List<SqlBlock> migrations = toSqlBlocks(migrationsOut.migrations());
 
-        List<RewrittenQuery> finalQueries = unique.stream()
-                .map(q -> optimizedQueries.getOrDefault(q.getQueryid(),
-                        RewrittenQuery.builder().queryid(q.getQueryid()).query(q.getQuery()).build()))
-                .toList();
+        List<RewrittenQuery> finalQueries = new ArrayList<>(optimizedQueries.values());
 
         log.info("Формирование результата завершено: финальный DDL={}, миграций={}, переписанных запросов={}",
                 finalDdl != null ? finalDdl.size() : 0,
