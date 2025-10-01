@@ -1,11 +1,13 @@
-package ru.javaboys.vibe_data.agent.tools;
+package ru.javaboys.vibe_data.service;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.javaboys.vibe_data.agent.tools.TrinoExplainType;
 import ru.javaboys.vibe_data.dto.TrinoResponse;
 
 @Slf4j
@@ -14,10 +16,17 @@ import ru.javaboys.vibe_data.dto.TrinoResponse;
 public class TrinoDbService {
     private static final String SQL_FORMAT_1 = "EXPLAIN (TYPE %s, FORMAT JSON) %s";
     private static final String SQL_FORMAT_2 = "EXPLAIN %s %s";
+    private static final String CACHE_NAME = "trino-db-explain-cache";
 
     private final JdbcTemplate trinoJdbcTemplate;
 
+    @Cacheable(
+            value = CACHE_NAME,
+            key = "{#sql, #type}",
+            unless = "#result == null || #result.response == null"
+    )
     public TrinoResponse explain(String sql, TrinoExplainType type) {
+        log.info("Executing explain request for type: {} and SQL: {}", type, sql);
         try {
             String explain = requestExplainInJsonInternal(sql, type);
             return TrinoResponse.success(explain);

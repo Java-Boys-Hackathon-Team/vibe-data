@@ -111,7 +111,41 @@ services:
     volumes:
       - ./trino-config:/etc/trino:rw
 
+  minio-client:
+    image: minio/mc:latest
+    depends_on: [ minio ]
+    networks: [ lake-net ]
+    entrypoint: >
+      /bin/sh -lc "
+      until (mc alias set minio http://minio:9000 admin password) do echo '...waiting...' && sleep 1; done;
+      mc mb -p minio/warehouse || true;
+      mc anonymous set public minio/warehouse || true;
+      tail -f /dev/null
+      "
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    command: [
+      "redis-server",
+      "--requirepass", "redisadmin",
+      "--appendonly", "yes",
+      "--maxmemory-policy", "allkeys-lru"
+    ]
+    ports:
+      - "26379:6379"
+    environment:
+      REDIS_PASSWORD: redisadmin
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a redisadmin ping | grep PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
 volumes:
+  redis_data:
   postgres_data:
   pgadmin_data:
     driver: local
