@@ -277,3 +277,4 @@ Temporary Items
 .idea/
 .env
 /http-client.private.env.json
+/data/minio/
