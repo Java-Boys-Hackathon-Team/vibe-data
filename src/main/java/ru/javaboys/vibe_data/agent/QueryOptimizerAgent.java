@@ -1,23 +1,13 @@
 package ru.javaboys.vibe_data.agent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import ru.javaboys.vibe_data.agent.tools.TrinoExplainTools;
-import ru.javaboys.vibe_data.agent.tools.TrinoReadOnlyQueryTools;
 import ru.javaboys.vibe_data.domain.Optimization;
 import ru.javaboys.vibe_data.domain.Task;
 import ru.javaboys.vibe_data.domain.TaskResult;
@@ -27,9 +17,20 @@ import ru.javaboys.vibe_data.domain.jsonb.RewrittenQuery;
 import ru.javaboys.vibe_data.domain.jsonb.SqlBlock;
 import ru.javaboys.vibe_data.llm.LlmRequest;
 import ru.javaboys.vibe_data.llm.LlmService;
+import ru.javaboys.vibe_data.monitoring.MethodStatsRepository;
 import ru.javaboys.vibe_data.repository.OptimizationRepository;
 import ru.javaboys.vibe_data.repository.TaskResultRepository;
 import ru.javaboys.vibe_data.validator.ValidationSwitcher;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -38,19 +39,33 @@ public class QueryOptimizerAgent {
 
     private final LlmService llmService;
     private final TrinoExplainTools trinoExplainTools;
-    private final TrinoReadOnlyQueryTools trinoReadOnlyQueryTools;
     private final TaskResultRepository taskResultRepository;
     private final PlatformTransactionManager transactionManager;
     private final OptimizationRepository optimizationRepository;
     private final ValidationSwitcher validationSwitcher;
 
+    // --- Time-budget configuration ---
+    private final MethodStatsRepository methodStatsRepository;
+
+    @Value("${processing.max-total-duration-ms}")
+    private long maxTotalDurationMs;
+
+    @Value("${validation.max-attempts}")
+    private int validationMaxAttempts;
+
+    @Value("${processing.default-llm-avg-ms}")
+    private long defaultLlmAvgMs;
+
     public TaskResult optimize(Task task) {
         var payload = task.getInput().getPayload();
 
-        log.info("Старт оптимизации задачи id={}: входные данные — DDL={}, запросов={}",
+        long startedAtNs = System.nanoTime();
+
+        log.info("Старт оптимизации задачи id={}: входные данные — DDL={}, запросов={}, бюджет времени={} мс",
                 task.getId(),
                 payload.getDdl() != null ? payload.getDdl().size() : 0,
-                payload.getQueries() != null ? payload.getQueries().size() : 0);
+                payload.getQueries() != null ? payload.getQueries().size() : 0,
+                maxTotalDurationMs);
 
         // 1. Системный промпт
         String conversationId = task.getId().toString();
@@ -101,6 +116,11 @@ public class QueryOptimizerAgent {
         // Карта optimizedQuery by id
         Map<String, RewrittenQuery> optimizedQueries = new LinkedHashMap<>();
 
+        // --- Вспомогательные значения бюджета ---
+        double avgLlmMsCached;
+        // кол-во зарезервированных обязательных LLM-запросов
+        int reserveCallsForMandatory = 1 + Math.max(0, validationMaxAttempts);
+
         // 5. Итеративная оптимизация
         for (int i = 0; i < sorted.size(); i++) {
             QueryInput q = sorted.get(i);
@@ -123,15 +143,17 @@ public class QueryOptimizerAgent {
                         q
                 );
             } catch (Exception e) {
+                if (isLlmTimeout(e)) {
+                    log.error("LLM timeout при оптимизации запроса id={} на итерации {}: {}. Продолжаем со следующим запросом.", q.getQueryid(), idx, e.getMessage());
+                    // пропускаем текущий запрос и продолжаем цикл
+                    continue;
+                }
                 log.error("Ошибка оптимизации запроса id={} на итерации {}: {}", q.getQueryid(), idx, e.getMessage(), e);
                 // Перед выбросом ошибки фиксируем накопленные результаты
                 persistToDb(task,
                         new ArrayList<>(accumulatedDdl),
                         List.of(),
-                        unique.stream()
-                                .map(qq -> optimizedQueries.getOrDefault(qq.getQueryid(),
-                                        RewrittenQuery.builder().queryid(qq.getQueryid()).query(qq.getQuery()).build()))
-                                .toList());
+                        new ArrayList<>(optimizedQueries.values()));
                 throw e;
             }
 
@@ -155,11 +177,30 @@ public class QueryOptimizerAgent {
             TaskResult saved = persistToDb(task,
                     new ArrayList<>(accumulatedDdl),
                     List.of(),
-                    unique.stream()
-                            .map(qq -> optimizedQueries.getOrDefault(qq.getQueryid(),
-                                    RewrittenQuery.builder().queryid(qq.getQueryid()).query(qq.getQuery()).build()))
-                            .toList());
+                    new ArrayList<>(optimizedQueries.values()));
             log.info("Итерация {}: промежуточный прогресс сохранён в TaskResult id={}", idx, saved.getId());
+
+            // --- Проверка бюджета времени: хватит ли на обязательные шаги? ---
+            // Обновляем среднюю длительность LLM, чтобы подстраиваться по ходу выполнения
+            avgLlmMsCached = resolveAvgLlmMs();
+            // elapsedMs - сколько уже времени прошло
+            long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAtNs);
+            // remainingMs - оставшееся время на всё
+            long remainingMs = maxTotalDurationMs - elapsedMs;
+            // резерв времени на обязательные шаги
+            long reserveMs = (long) Math.ceil(reserveCallsForMandatory * avgLlmMsCached);
+            // оставшееся время для оптимизаций
+            long availableForOptimizationMs = remainingMs - reserveMs;
+
+            if (availableForOptimizationMs < Math.ceil(avgLlmMsCached)) {
+                log.info("Остановка итеративной оптимизации на шаге {}: оставшееся время={} мс, резерв на обязательные шаги={} мс ({} LLM), средний LLM={} мс.",
+                        idx, remainingMs, reserveMs, reserveCallsForMandatory, Math.round(avgLlmMsCached));
+                break; // выходим из цикла, переходим к генерации миграций и валидации
+            } else {
+                long mayDo = (long) Math.floor(availableForOptimizationMs / Math.max(1.0, avgLlmMsCached));
+                log.info("После итерации {} остаётся ~{} мс для оптимизации (без резерва). Этого хватит примерно на {} LLM-запрос(ов).",
+                        idx, availableForOptimizationMs, mayDo);
+            }
         }
 
         // 6. Генерация миграций (финальный шаг)
@@ -182,10 +223,7 @@ public class QueryOptimizerAgent {
         List<SqlBlock> finalDdl = normalizeDdlOrder(migrationsOut.newDdl());
         List<SqlBlock> migrations = toSqlBlocks(migrationsOut.migrations());
 
-        List<RewrittenQuery> finalQueries = unique.stream()
-                .map(q -> optimizedQueries.getOrDefault(q.getQueryid(),
-                        RewrittenQuery.builder().queryid(q.getQueryid()).query(q.getQuery()).build()))
-                .toList();
+        List<RewrittenQuery> finalQueries = new ArrayList<>(optimizedQueries.values());
 
         log.info("Формирование результата завершено: финальный DDL={}, миграций={}, переписанных запросов={}",
                 finalDdl != null ? finalDdl.size() : 0,
@@ -226,7 +264,7 @@ public class QueryOptimizerAgent {
         userVars.put("query_sql", q.getQuery());
 
         // Tools: отдаём набор инструментов EXPLAIN/ANALYZE + чтение read-only
-        List<Object> tools = List.of(trinoExplainTools, trinoReadOnlyQueryTools);
+        List<Object> tools = List.of(trinoExplainTools);
 
         return llmService.callAs(
                 LlmRequest.builder()
@@ -258,7 +296,7 @@ public class QueryOptimizerAgent {
                         .map(SqlBlock::getStatement).collect(Collectors.joining("\n\n"))
         );
 
-        List<Object> tools = List.of(trinoExplainTools, trinoReadOnlyQueryTools);
+        List<Object> tools = List.of(trinoExplainTools);
 
         return llmService.callAs(
                 LlmRequest.builder()
@@ -298,6 +336,34 @@ public class QueryOptimizerAgent {
             TaskResult saved = taskResultRepository.saveAndFlush(entity);
             return saved;
         });
+    }
+
+    private boolean isLlmTimeout(Throwable e) {
+        if (e == null) return false;
+        // Match by FQCNs to avoid compile-time dependency on specific Resilience4j exception class name variations
+        String exClass = e.getClass().getName();
+        if ("io.github.resilience4j.timelimiter.TimeoutException".equals(exClass)
+                || "io.github.resilience4j.core.TimeoutExceededException".equals(exClass)
+                || (e instanceof java.util.concurrent.TimeoutException)) {
+            return true;
+        }
+        Throwable cause = e.getCause();
+        return cause != null && cause != e && isLlmTimeout(cause);
+    }
+
+    private double resolveAvgLlmMs() {
+        try {
+            var asOpt = methodStatsRepository.findByKey("llm.call.as");
+            if (asOpt.isPresent() && asOpt.get().getAvgTimeMs() != null && asOpt.get().getAvgTimeMs() > 0) {
+                return asOpt.get().getAvgTimeMs();
+            }
+            var callOpt = methodStatsRepository.findByKey("llm.call");
+            if (callOpt.isPresent() && callOpt.get().getAvgTimeMs() != null && callOpt.get().getAvgTimeMs() > 0) {
+                return callOpt.get().getAvgTimeMs();
+            }
+        } catch (Exception ignored) {
+        }
+        return Math.max(1, (int) defaultLlmAvgMs);
     }
 
     private List<SqlBlock> normalizeDdlOrder(List<String> ddlStatements) {

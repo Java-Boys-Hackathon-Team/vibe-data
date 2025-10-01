@@ -1,15 +1,9 @@
 package ru.javaboys.vibe_data.service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javaboys.vibe_data.agent.QueryOptimizerAgent;
 import ru.javaboys.vibe_data.agent.tools.TrinoExplainType;
 import ru.javaboys.vibe_data.domain.Task;
@@ -19,6 +13,11 @@ import ru.javaboys.vibe_data.domain.TaskStatus;
 import ru.javaboys.vibe_data.domain.jsonb.QueryInput;
 import ru.javaboys.vibe_data.domain.jsonb.TaskInputPayload;
 import ru.javaboys.vibe_data.repository.TaskRepository;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
