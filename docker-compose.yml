@@ -17,7 +17,7 @@ services:
       - PG_NAME=pgadmin
       - PG_PASS=pgadmin
       - TRINO_QUERY_TIMEOUT=20
-      - VALIDATION_MAX_ATTEMPTS=10
+      - VALIDATION_MAX_ATTEMPTS=3
       - TRINO_JDBC_URL=jdbc:trino://vibe-data-trino-1:8080/iceberg
     env_file:
       - .env
