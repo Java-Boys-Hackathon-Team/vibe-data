@@ -26,6 +26,12 @@ S3) и других СУБД.
 
 [Смотреть презентацию Vibe Data](./Java_Boys_Vibe_Data_Система_рекомендаций_по_оптимизации_производительности_Data_Lakehouse.pdf)
 
+## Swagger / OpenAPI
+
+[https://api.vibe-data.javaboys.ru/swagger-ui/index.html](https://api.vibe-data.javaboys.ru/swagger-ui/index.html)
+
+---
+
 ## Цели и задачи
 
 * Сокращение среднего времени выполнения запросов за счёт:
@@ -217,12 +223,6 @@ erDiagram
 * Trino (JdbcTemplate): `spring.jdbc.template.trino.query-timeout` (env `TRINO_QUERY_TIMEOUT`, по умолчанию 20с).
 
 Агент динамически оценивает среднюю длительность LLM-запросов и завершает итерации заранее, чтобы уложиться в лимит.
-
----
-
-## Swagger / OpenAPI
-
-[https://api.vibe-data.javaboys.ru/swagger-ui/index.html](https://api.vibe-data.javaboys.ru/swagger-ui/index.html)
 
 ---
 
