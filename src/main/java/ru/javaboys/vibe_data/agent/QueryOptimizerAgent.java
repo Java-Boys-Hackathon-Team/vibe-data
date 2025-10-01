@@ -143,6 +143,11 @@ public class QueryOptimizerAgent {
                         q
                 );
             } catch (Exception e) {
+                if (isLlmTimeout(e)) {
+                    log.error("LLM timeout при оптимизации запроса id={} на итерации {}: {}. Продолжаем со следующим запросом.", q.getQueryid(), idx, e.getMessage());
+                    // пропускаем текущий запрос и продолжаем цикл
+                    continue;
+                }
                 log.error("Ошибка оптимизации запроса id={} на итерации {}: {}", q.getQueryid(), idx, e.getMessage(), e);
                 // Перед выбросом ошибки фиксируем накопленные результаты
                 persistToDb(task,
@@ -331,6 +336,19 @@ public class QueryOptimizerAgent {
             TaskResult saved = taskResultRepository.saveAndFlush(entity);
             return saved;
         });
+    }
+
+    private boolean isLlmTimeout(Throwable e) {
+        if (e == null) return false;
+        // Match by FQCNs to avoid compile-time dependency on specific Resilience4j exception class name variations
+        String exClass = e.getClass().getName();
+        if ("io.github.resilience4j.timelimiter.TimeoutException".equals(exClass)
+                || "io.github.resilience4j.core.TimeoutExceededException".equals(exClass)
+                || (e instanceof java.util.concurrent.TimeoutException)) {
+            return true;
+        }
+        Throwable cause = e.getCause();
+        return cause != null && cause != e && isLlmTimeout(cause);
     }
 
     private double resolveAvgLlmMs() {

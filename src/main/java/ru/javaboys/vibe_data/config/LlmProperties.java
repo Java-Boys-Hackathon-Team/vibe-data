@@ -1,11 +1,10 @@
 package ru.javaboys.vibe_data.config;
 
-import java.util.List;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
@@ -14,5 +13,6 @@ public class LlmProperties {
     private final String llmModel;
     private final Double temperature;
     private final List<String> validModels;
+    private final Integer timeoutSeconds;
 
 }
