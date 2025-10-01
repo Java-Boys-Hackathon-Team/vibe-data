@@ -22,7 +22,7 @@ public class TrinoDbService {
 
     @Cacheable(
             value = CACHE_NAME,
-            key = "{#sql, #type}",
+            key = "{@CacheKeyUtils.normalize(#sql), #type}",
             unless = "#result == null || #result.response == null"
     )
     public TrinoResponse explain(String sql, TrinoExplainType type) {
