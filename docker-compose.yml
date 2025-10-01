@@ -14,6 +14,8 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - PG_DATASOURCE_URL=jdbc:postgresql://vibe-data-db:5432/vibedata
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
       - PG_NAME=pgadmin
       - PG_PASS=pgadmin
       - TRINO_QUERY_TIMEOUT=20
