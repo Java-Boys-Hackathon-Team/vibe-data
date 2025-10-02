@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "Запрос на создание новой оптимизации")
+@Schema(description = "Запрос на создание новой оптимизации")
 public class NewOptimizationRequestDto {
     @NotBlank
-    @Schema(name = "Описание")
+    @Schema(description = "Описание")
     private String text;
 
 }

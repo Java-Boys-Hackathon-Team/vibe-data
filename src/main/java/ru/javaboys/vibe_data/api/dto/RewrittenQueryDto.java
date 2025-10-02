@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "Переписанный запрос")
+@Schema(description = "Переписанный запрос")
 public class RewrittenQueryDto {
     @NotBlank
-    @Schema(name = "Идентификатор")
+    @Schema(description = "Идентификатор")
     private String queryid;
 
     @NotBlank
-    @Schema(name = "запрос")
+    @Schema(description = "запрос")
     private String query;
 }

@@ -17,28 +17,28 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "Создание новой задачи")
+@Schema(description = "Создание новой задачи")
 public class NewTaskRequestDto {
 
-    @Schema(name = "Модель LLM")
+    @Schema(description = "Модель LLM")
     private String llmModel;
 
     @Min(0)
     @Max(1)
-    @Schema(name = "Температура LLM")
+    @Schema(description = "Температура LLM")
     private Double temperature;
 
     @NotBlank
-    @Schema(name = "URL")
+    @Schema(description = "URL")
     private String url;
 
     @NotEmpty
     @Valid
-    @Schema(name = "Список DDL")
+    @Schema(description = "Список DDL")
     private List<DdlStatementDto> ddl;
 
     @NotEmpty
     @Valid
-    @Schema(name = "Список запросов")
+    @Schema(description = "Список запросов")
     private List<QueryInputDto> queries;
 }

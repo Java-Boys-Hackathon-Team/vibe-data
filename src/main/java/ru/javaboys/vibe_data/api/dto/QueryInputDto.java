@@ -12,19 +12,19 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "Запрос")
+@Schema(description = "Запрос")
 public class QueryInputDto {
     @NotBlank
-    @Schema(name = "Идентификатор")
+    @Schema(description = "Идентификатор")
     private String queryid;
 
     @NotBlank
-    @Schema(name = "Запрос")
+    @Schema(description = "Запрос")
     private String query;
 
     @Min(0)
 
-    @Schema(name = "Количество запусков")
+    @Schema(description = "Количество запусков")
     private int runquantity;
 
     /**
@@ -32,6 +32,6 @@ public class QueryInputDto {
      * Необязательное поле: если не задано или 0 — считаем равным 1 при сортировке.
      */
     @Min(0)
-    @Schema(name = "Время выполнения")
+    @Schema(description = "Время выполнения")
     private int executiontime;
 }

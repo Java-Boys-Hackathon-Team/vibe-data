@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "Описание DDL")
+@Schema(description = "Описание DDL")
 public class DdlStatementDto {
     @NotBlank
-    @Schema(name = "Запрос")
+    @Schema(description = "Запрос")
     private String statement;
 }

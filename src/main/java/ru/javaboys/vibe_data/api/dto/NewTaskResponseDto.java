@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "Ответ на создание задачи")
+@Schema(description = "Ответ на создание задачи")
 public class NewTaskResponseDto {
-    @Schema(name = "Идентификатор задачи")
+    @Schema(description = "Идентификатор задачи")
     private UUID taskid;
 }

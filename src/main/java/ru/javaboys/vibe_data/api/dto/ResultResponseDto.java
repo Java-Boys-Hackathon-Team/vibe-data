@@ -14,20 +14,20 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "Идентификатор")
+@Schema(description = "Идентификатор")
 public class ResultResponseDto {
     @NotEmpty
     @Valid
-    @Schema(name = "Список DDL")
+    @Schema(description = "Список DDL")
     private List<SqlBlockDto> ddl;
 
     @NotEmpty
     @Valid
-    @Schema(name = "Список миграций")
+    @Schema(description = "Список миграций")
     private List<SqlBlockDto> migrations;
 
     @NotEmpty
     @Valid
-    @Schema(name = "Список запросов")
+    @Schema(description = "Список запросов")
     private List<RewrittenQueryDto> queries;
 }
