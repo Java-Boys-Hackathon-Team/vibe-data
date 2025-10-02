@@ -10,13 +10,13 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-@Schema(name = "Оптимизация")
+@Schema(description = "Оптимизация")
 public class OptimizationDto {
-    @Schema(name = "Идентификатор")
+    @Schema(description = "Идентификатор")
     private final UUID id;
-    @Schema(name = "Описание")
+    @Schema(description = "Описание")
     private final String text;
-    @Schema(name = "Флаг активности")
+    @Schema(description = "Флаг активности")
     private final boolean active;
 
 }

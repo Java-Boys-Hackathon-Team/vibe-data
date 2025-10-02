@@ -11,8 +11,8 @@ import ru.javaboys.vibe_data.domain.TaskStatus;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "Статус задачи")
+@Schema(description = "Статус задачи")
 public class StatusResponseDto {
-    @Schema(name = "Статус")
+    @Schema(description = "Статус")
     private TaskStatus status;
 }

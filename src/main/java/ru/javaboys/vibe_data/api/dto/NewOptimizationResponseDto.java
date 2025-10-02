@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "Ответ на создание оптимизации")
+@Schema(description = "Ответ на создание оптимизации")
 public class NewOptimizationResponseDto {
     @NotNull
-    @Schema(name = "Идентификатор")
+    @Schema(description = "Идентификатор")
     private UUID id;
 
 }

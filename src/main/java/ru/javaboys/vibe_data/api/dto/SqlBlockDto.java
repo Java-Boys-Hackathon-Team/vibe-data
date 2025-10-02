@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "SQL запрос")
+@Schema(description = "SQL запрос")
 public class SqlBlockDto {
     @NotBlank
-    @Schema(name = "Запрос")
+    @Schema(description = "Запрос")
     private String statement;
 }
