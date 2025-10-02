@@ -1,5 +1,6 @@
 package ru.javaboys.vibe_data.api.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,8 @@ import ru.javaboys.vibe_data.domain.TaskStatus;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(name = "Статус задачи")
 public class StatusResponseDto {
+    @Schema(name = "Статус")
     private TaskStatus status;
 }
