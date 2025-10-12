@@ -20,6 +20,7 @@ import ru.javaboys.vibe_data.llm.LlmService;
 import ru.javaboys.vibe_data.monitoring.MethodStatsRepository;
 import ru.javaboys.vibe_data.repository.OptimizationRepository;
 import ru.javaboys.vibe_data.repository.TaskResultRepository;
+import ru.javaboys.vibe_data.service.SqlCacheWarmupService;
 import ru.javaboys.vibe_data.validator.ValidationSwitcher;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class QueryOptimizerAgent {
     private final PlatformTransactionManager transactionManager;
     private final OptimizationRepository optimizationRepository;
     private final ValidationSwitcher validationSwitcher;
+    private final SqlCacheWarmupService sqlCacheWarmupService;
 
     // --- Time-budget configuration ---
     private final MethodStatsRepository methodStatsRepository;
@@ -110,6 +112,9 @@ public class QueryOptimizerAgent {
             return Long.compare(wb, wa);
         });
         log.info("Запросов к оптимизации: {}. Запускаем итеративный цикл.", sorted.size());
+
+        // Стартуем прогрев кэша explain непосредственно перед началом итеративной оптимизации
+        Thread.ofPlatform().name("cache-filler").start(() -> sqlCacheWarmupService.runSqlCacheProcess(sorted));
 
         // 4. копим изменения DDL по шагам
         Set<SqlBlock> accumulatedDdl = new LinkedHashSet<>();
