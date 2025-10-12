@@ -8,7 +8,6 @@ services:
       - ./sources:/app/sources
     restart: always
     container_name: vibe-data
-    networks: [ lake-net ]
     ports:
       - "8086:8080"
     environment:
@@ -22,7 +21,6 @@ services:
       - VALIDATION_MAX_ATTEMPTS=3
       - TRINO_JDBC_URL=jdbc:trino://vibe-data-trino-1:8080/iceberg
       - VALIDATION_ENABLED=true
-      - LLM_TIMEOUT_SECONDS=60
     env_file:
       - .env
     extra_hosts:
@@ -37,7 +35,6 @@ services:
       context: postgres
     restart: always
     container_name: vibe-data-db
-    networks: [ lake-net ]
     ports:
       - "25436:5432"
     volumes:
@@ -51,7 +48,6 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     restart: always
-    networks: [ lake-net ]
     environment:
       PGADMIN_DEFAULT_EMAIL: "kuramshin.py@yandex.ru"
       PGADMIN_DEFAULT_PASSWORD: "admin"
@@ -72,7 +68,6 @@ services:
       # говорим MinIO, что *.minio — его домены
       MINIO_DOMAIN: minio
       MINIO_SERVER_URL: http://minio:9000
-    networks: [ lake-net ]
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -82,7 +77,6 @@ services:
 
   iceberg-rest:
     image: tabulario/iceberg-rest:latest
-    networks: [ lake-net ]
     environment:
       # --- конфиг каталога для самого REST-сервиса ---
       CATALOG_WAREHOUSE: s3://warehouse/
@@ -105,7 +99,6 @@ services:
   trino:
     image: trinodb/trino:latest
     depends_on: [ iceberg-rest ]   # можно и убрать, REST нам больше не нужен
-    networks: [ lake-net ]
     ports: [ "18080:8080" ]
     environment:
       - AWS_REGION=us-east-1
@@ -141,7 +134,3 @@ volumes:
   postgres_data:
   pgadmin_data:
     driver: local
-
-networks:
-  lake-net:
-    name: lake-net
