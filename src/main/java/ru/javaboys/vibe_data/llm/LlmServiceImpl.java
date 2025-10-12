@@ -48,7 +48,7 @@ public class LlmServiceImpl implements LlmService {
     }
 
     private <T> T executeWithTimeout(Callable<T> callable) {
-        int timeoutSec = llmProperties.getTimeoutSeconds() != null ? llmProperties.getTimeoutSeconds() : 60;
+        int timeoutSec = llmProperties.getTimeoutSeconds();
         TimeLimiterConfig config = TimeLimiterConfig.custom()
                 .timeoutDuration(Duration.ofSeconds(timeoutSec))
                 .cancelRunningFuture(true)
@@ -72,6 +72,30 @@ public class LlmServiceImpl implements LlmService {
     }
 
     private ChatClient.ChatClientRequestSpec prepareChatClient(LlmRequest request) {
+        List<Message> messages = getPromptMessages(request);
+
+        OpenAiChatOptions options = OpenAiChatOptions.builder()
+                .model(Objects.requireNonNullElse(request.getLlmModel(), llmProperties.getLlmModel()))
+                .temperature(Objects.requireNonNullElse(request.getTemperature(), llmProperties.getTemperature()))
+                .build();
+        Prompt prompt = new Prompt(messages, options);
+
+        var chatClientRequestSpec = chatClient.prompt(prompt);
+
+        String conversationId = request.getConversationId();
+        if (conversationId != null) {
+            chatClientRequestSpec = chatClientRequestSpec.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId));
+        }
+
+        List<Object> tools = request.getTools();
+        if (tools != null && !tools.isEmpty()) {
+            chatClientRequestSpec = chatClientRequestSpec.tools(tools.toArray());
+        }
+
+        return chatClientRequestSpec;
+    }
+
+    private static List<Message> getPromptMessages (LlmRequest request) {
         List<Message> messages = new ArrayList<>();
 
         String systemMessage = request.getSystemMessage();
@@ -99,25 +123,6 @@ public class LlmServiceImpl implements LlmService {
             }
             messages.add(userMsg);
         }
-
-        OpenAiChatOptions options = OpenAiChatOptions.builder()
-                .model(Objects.requireNonNullElse(request.getLlmModel(), llmProperties.getLlmModel()))
-                .temperature(Objects.requireNonNullElse(request.getTemperature(), llmProperties.getTemperature()))
-                .build();
-        Prompt prompt = new Prompt(messages, options);
-
-        var chatClientRequestSpec = chatClient.prompt(prompt);
-
-        String conversationId = request.getConversationId();
-        if (conversationId != null) {
-            chatClientRequestSpec = chatClientRequestSpec.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId));
-        }
-
-        List<Object> tools = request.getTools();
-        if (tools != null && !tools.isEmpty()) {
-            chatClientRequestSpec = chatClientRequestSpec.tools(tools.toArray());
-        }
-
-        return chatClientRequestSpec;
+        return messages;
     }
 }
