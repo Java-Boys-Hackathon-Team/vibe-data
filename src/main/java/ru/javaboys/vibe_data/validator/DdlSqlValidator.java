@@ -6,19 +6,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.javaboys.vibe_data.agent.PromptTemplates;
 import ru.javaboys.vibe_data.domain.Task;
 import ru.javaboys.vibe_data.domain.jsonb.DdlStatement;
 import ru.javaboys.vibe_data.domain.jsonb.QueryInput;
 import ru.javaboys.vibe_data.domain.jsonb.RewrittenQuery;
 import ru.javaboys.vibe_data.domain.jsonb.SqlBlock;
+import ru.javaboys.vibe_data.dto.AutoFixOutput;
+import ru.javaboys.vibe_data.dto.ValidationPatch;
 import ru.javaboys.vibe_data.exception.ValidationFailedException;
 import ru.javaboys.vibe_data.llm.LlmRequest;
 import ru.javaboys.vibe_data.llm.LlmService;
 import ru.javaboys.vibe_data.validator.dto.SqlFile;
 import ru.javaboys.vibe_data.validator.dto.ValidationModels;
-import ru.javaboys.vibe_data.agent.PromptTemplates;
-import ru.javaboys.vibe_data.dto.AutoFixOutput;
-import ru.javaboys.vibe_data.dto.ValidationPatch;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -923,7 +922,6 @@ public class DdlSqlValidator {
 
         // 3) Вызов LLM
         LlmRequest lr = LlmRequest.builder()
-                .conversationId(UUID.randomUUID().toString())
                 .systemMessage(system)
                 .userMessage(user)
                 .build();
