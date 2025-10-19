@@ -275,11 +275,7 @@ docker compose up -d
 
 ## Безопасность
 
-* Доступ к API защищён Basic Auth.
-* Логин/пароль настраиваются переменными окружения:
-
-  * `BASIC_AUTH_USERNAME`
-  * `BASIC_AUTH_PASSWORD`
+* Доступ к API открыт
 
 ---
 
@@ -290,8 +286,6 @@ docker compose up -d
 Минимально необходимые параметры для запуска:
 
 - OPENAI_API_KEY — API‑ключ для Spring AI (OpenAI). Без него LLM‑агент работать не будет.
-- BASIC_AUTH_USERNAME — логин для HTTP Basic Auth (доступ к API).
-- BASIC_AUTH_PASSWORD — пароль для HTTP Basic Auth.
 
 Опциональные параметры (имеют значения по умолчанию):
 
@@ -309,5 +303,3 @@ docker compose up -d
 ```
 # обязательные
 OPENAI_API_KEY=sk-...your_key...
-BASIC_AUTH_USERNAME=javaboys
-BASIC_AUTH_PASSWORD=change_me
