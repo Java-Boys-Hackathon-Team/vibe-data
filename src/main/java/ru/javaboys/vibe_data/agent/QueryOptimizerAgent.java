@@ -99,6 +99,7 @@ public class QueryOptimizerAgent {
                 .collect(Collectors.joining("\n\n"));
 
         // 3. удаление дублей по полю QueryInput.query + сортировка по весу
+        String trinoUrl = payload.getUrl();
         List<QueryInput> inputQueries = payload.getQueries();
         List<QueryInput> unique = dedupeQueriesByText(inputQueries);
         if (inputQueries != null && unique != null && unique.size() < inputQueries.size()) {
@@ -114,7 +115,7 @@ public class QueryOptimizerAgent {
         log.info("Запросов к оптимизации: {}. Запускаем итеративный цикл.", sorted.size());
 
         // Стартуем прогрев кэша explain непосредственно перед началом итеративной оптимизации
-        Thread.ofPlatform().name("cache-filler").start(() -> sqlCacheWarmupService.runSqlCacheProcess(sorted));
+        Thread.ofPlatform().name("cache-filler").start(() -> sqlCacheWarmupService.runSqlCacheProcess(trinoUrl, sorted));
 
         // 4. копим изменения DDL по шагам
         Set<SqlBlock> accumulatedDdl = new LinkedHashSet<>();

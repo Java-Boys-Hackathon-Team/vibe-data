@@ -20,7 +20,7 @@ public class SqlCacheWarmupService {
      * Прогревает кеш explain-запросов для переданного упорядоченного списка запросов.
      * Метод устойчив к null и пустым спискам.
      */
-    public void runSqlCacheProcess(List<QueryInput> queryInputList) {
+    public void runSqlCacheProcess(String trinoUrl, List<QueryInput> queryInputList) {
         List<QueryInput> queries = queryInputList == null ? Collections.emptyList() : queryInputList;
         if (queries.isEmpty()) {
             log.info("Прогрев кэша: список запросов пуст — пропуск");
@@ -31,7 +31,7 @@ public class SqlCacheWarmupService {
             String sql = query.getQuery();
             for (TrinoExplainType type : TrinoExplainType.values()) {
                 try {
-                    trinoDbService.explain(sql, type);
+                    trinoDbService.explain(trinoUrl, sql, type);
                 } catch (Exception e) {
                     // Не прерываем прогрев при ошибке одного из explain
                     log.warn("Ошибка прогрева кэша для type={} queryId={}: {}", type, query.getQueryid(), e.getMessage());

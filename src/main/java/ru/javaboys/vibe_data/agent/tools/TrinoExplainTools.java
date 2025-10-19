@@ -21,27 +21,42 @@ public class TrinoExplainTools {
     private final TrinoDbService trinoDbService;
 
     @Tool(description = "Получить план EXPLAIN LOGICAL для указанного SQL.")
-    public TrinoResponse explainLogical(@ToolParam(description = "SQL-запрос, для которого нужно получить план") String sql) {
-        return trinoDbService.explain(sql, TrinoExplainType.LOGICAL);
+    public TrinoResponse explainLogical(
+            @ToolParam(description = "Url для подключения") String url,
+            @ToolParam(description = "SQL-запрос, для которого нужно получить план") String sql
+    ) {
+        return trinoDbService.explain(url, sql, TrinoExplainType.LOGICAL);
     }
 
     @Tool(description = "Получить план EXPLAIN DISTRIBUTED для указанного SQL.")
-    public TrinoResponse explainDistributed(@ToolParam(description = "SQL-запрос, для которого нужно получить план") String sql) {
-        return trinoDbService.explain(sql, TrinoExplainType.DISTRIBUTED);
+    public TrinoResponse explainDistributed(
+            @ToolParam(description = "Url для подключения") String url,
+            @ToolParam(description = "SQL-запрос, для которого нужно получить план") String sql
+    ) {
+        return trinoDbService.explain(url, sql, TrinoExplainType.DISTRIBUTED);
     }
 
     @Tool(description = "Получить план EXPLAIN IO для указанного SQL; включает сводку ввода-вывода.")
-    public TrinoResponse explainIo(@ToolParam(description = "SQL-запрос, для которого нужно получить план") String sql) {
-        return trinoDbService.explain(sql, TrinoExplainType.IO);
+    public TrinoResponse explainIo(
+            @ToolParam(description = "Url для подключения") String url,
+            @ToolParam(description = "SQL-запрос, для которого нужно получить план") String sql
+    ) {
+        return trinoDbService.explain(url, sql, TrinoExplainType.IO);
     }
 
     @Tool(description = "Выполнить EXPLAIN ANALYZE для указанного SQL. ВНИМАНИЕ: запрос будет выполнен.")
-    public TrinoResponse explainAnalyze(@ToolParam(description = "SQL-запрос, для которого нужно получить метрики исполнения") String sql) {
-        return trinoDbService.explain(sql, TrinoExplainType.ANALYZE);
+    public TrinoResponse explainAnalyze(
+            @ToolParam(description = "Url для подключения") String url,
+            @ToolParam(description = "SQL-запрос, для которого нужно получить метрики исполнения") String sql
+    ) {
+        return trinoDbService.explain(url, sql, TrinoExplainType.ANALYZE);
     }
 
     @Tool(description = "Выполнить EXPLAIN ANALYZE VERBOSE для указанного SQL. ВНИМАНИЕ: запрос будет выполнен.")
-    public TrinoResponse explainAnalyzeVerbose(@ToolParam(description = "SQL-запрос, для которого нужно получить подробные метрики исполнения") String sql) {
-        return trinoDbService.explain(sql, TrinoExplainType.ANALYZE_VERBOSE);
+    public TrinoResponse explainAnalyzeVerbose(
+            @ToolParam(description = "Url для подключения") String url,
+            @ToolParam(description = "SQL-запрос, для которого нужно получить подробные метрики исполнения") String sql
+    ) {
+        return trinoDbService.explain(url, sql, TrinoExplainType.ANALYZE_VERBOSE);
     }
 }
