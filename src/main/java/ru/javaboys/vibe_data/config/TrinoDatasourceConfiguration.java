@@ -32,4 +32,13 @@ public class TrinoDatasourceConfiguration {
         return new JdbcTemplate(dataSource);
     }
 
+    public static JdbcTemplate templateForUrl(String url) {
+        DataSource dataSource = new DataSourceProperties()
+                .initializeDataSourceBuilder()
+                .url(url)
+                .build();
+
+        return new JdbcTemplate(dataSource);
+    }
+
 }
