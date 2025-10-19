@@ -12,7 +12,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
-import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.stereotype.Service;
 import ru.javaboys.vibe_data.config.LlmProperties;
 import ru.javaboys.vibe_data.monitoring.Monitored;
@@ -74,7 +74,7 @@ public class LlmServiceImpl implements LlmService {
     private ChatClient.ChatClientRequestSpec prepareChatClient(LlmRequest request) {
         List<Message> messages = getPromptMessages(request);
 
-        OpenAiChatOptions options = OpenAiChatOptions.builder()
+        OllamaOptions options = OllamaOptions.builder()
                 .model(Objects.requireNonNullElse(request.getLlmModel(), llmProperties.getLlmModel()))
                 .temperature(Objects.requireNonNullElse(request.getTemperature(), llmProperties.getTemperature()))
                 .build();

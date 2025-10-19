@@ -40,3 +40,17 @@ Content-Type: application/json
 GET {{baseUrl}}/api/v1/optimizations
 Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
+
+### Пингануть модель
+
+POST {{baseUrl}}/api/llm/ask
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+
+{
+  "userMessage": "расскажи о приемуществах java",
+  "temperature": 0.4
+}
+
+###
+
