@@ -70,7 +70,6 @@ public class QueryOptimizerAgent {
                 maxTotalDurationMs);
 
         // 1. Системный промпт
-        String conversationId = task.getId().toString();
         String system;
         Map<String, Object> sysVars;
 
@@ -140,7 +139,6 @@ public class QueryOptimizerAgent {
                 out = runQueryOptimizationStep(
                         task.getLlmModel(),
                         task.getTemperature(),
-                        conversationId,
                         system,
                         sysVars,
                         originalDdlJoined,
@@ -213,7 +211,6 @@ public class QueryOptimizerAgent {
         FinalMigrationOutput migrationsOut;
         try {
             migrationsOut = runMigrationSynthesis(
-                    conversationId,
                     system,
                     sysVars,
                     originalDdlJoined,
@@ -250,7 +247,6 @@ public class QueryOptimizerAgent {
     private PerQueryOptimizationOutput runQueryOptimizationStep(
             String llmModel,
             Double temperature,
-            String conversationId,
             String system,
             Map<String, Object> sysVars,
             String originalDdl,
@@ -275,7 +271,6 @@ public class QueryOptimizerAgent {
                 LlmRequest.builder()
                         .llmModel(llmModel)
                         .temperature(temperature)
-                        .conversationId(conversationId)
                         .systemMessage(system)
                         .systemVariables(sysVars)
                         .userMessage(userTemplate)
@@ -287,7 +282,6 @@ public class QueryOptimizerAgent {
     }
 
     private FinalMigrationOutput runMigrationSynthesis(
-            String conversationId,
             String system,
             Map<String, Object> sysVars,
             String originalDdl,
@@ -305,7 +299,6 @@ public class QueryOptimizerAgent {
 
         return llmService.callAs(
                 LlmRequest.builder()
-                        .conversationId(conversationId)
                         .systemMessage(system)
                         .systemVariables(sysVars)
                         .userMessage(userTemplate)
