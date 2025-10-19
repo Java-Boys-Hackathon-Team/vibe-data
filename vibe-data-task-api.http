@@ -1,11 +1,9 @@
 ### Health Check
 GET {{baseUrl}}/actuator/health
-Authorization: Basic {{username}} {{password}}
 
 ### Create new task
 # @name newTask
 POST {{baseUrl}}/new
-Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 
 {
@@ -47,8 +45,6 @@ Content-Type: application/json
 
 ### Get status
 GET {{baseUrl}}/status?task_id={{task_id}}
-Authorization: Basic {{username}} {{password}}
 
 ### Get result
 GET {{baseUrl}}/getresult?task_id={{task_id}}
-Authorization: Basic {{username}} {{password}}

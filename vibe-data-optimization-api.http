@@ -1,6 +1,5 @@
 ### Optimization create
 POST {{baseUrl}}/api/v1/optimizations/new
-Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 
 {
@@ -23,20 +22,16 @@ Content-Type: application/json
 
 ### Optimization getById
 GET {{baseUrl}}/api/v1/optimizations/{{optimization_id}}
-Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 
 ### Optimization deactivate
 POST {{baseUrl}}/api/v1/optimizations/{{optimization_id}}/deactivate
-Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 
 ### Optimization activate
 POST {{baseUrl}}/api/v1/optimizations/{{optimization_id}}/activate
-Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 
 ### Optimization get
 GET {{baseUrl}}/api/v1/optimizations
-Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
