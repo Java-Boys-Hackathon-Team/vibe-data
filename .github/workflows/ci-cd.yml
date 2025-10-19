@@ -49,7 +49,7 @@ jobs:
         with:
           host: api.vibe-data.javaboys.ru
           username: ubuntu
-          port: 50151
+          port: 22
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/vibe-data
