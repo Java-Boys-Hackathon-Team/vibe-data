@@ -8,6 +8,7 @@ import ru.javaboys.vibe_data.domain.jsonb.QueryInput;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -20,7 +21,7 @@ public class SqlCacheWarmupService {
      * Прогревает кеш explain-запросов для переданного упорядоченного списка запросов.
      * Метод устойчив к null и пустым спискам.
      */
-    public void runSqlCacheProcess(String trinoUrl, List<QueryInput> queryInputList) {
+    public void runSqlCacheProcess(UUID taskId, List<QueryInput> queryInputList) {
         List<QueryInput> queries = queryInputList == null ? Collections.emptyList() : queryInputList;
         if (queries.isEmpty()) {
             log.info("Прогрев кэша: список запросов пуст — пропуск");
@@ -28,10 +29,9 @@ public class SqlCacheWarmupService {
         }
         log.info("Старт прогрева кэша explain для {} запросов", queries.size());
         for (QueryInput query : queries) {
-            String sql = query.getQuery();
             for (TrinoExplainType type : TrinoExplainType.values()) {
                 try {
-                    trinoDbService.explain(trinoUrl, sql, type);
+                    trinoDbService.explain(taskId, query.getQueryid(), type);
                 } catch (Exception e) {
                     // Не прерываем прогрев при ошибке одного из explain
                     log.warn("Ошибка прогрева кэша для type={} queryId={}: {}", type, query.getQueryid(), e.getMessage());
