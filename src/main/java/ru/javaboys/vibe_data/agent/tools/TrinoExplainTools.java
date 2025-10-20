@@ -1,13 +1,14 @@
 package ru.javaboys.vibe_data.agent.tools;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import ru.javaboys.vibe_data.dto.TrinoResponse;
 import ru.javaboys.vibe_data.service.TrinoDbService;
+
+import java.util.UUID;
 
 /**
  * Набор инструментов, доступных LLM через Tool Calling (Spring AI Function Calling).
@@ -20,43 +21,43 @@ public class TrinoExplainTools {
 
     private final TrinoDbService trinoDbService;
 
-    @Tool(description = "Получить план EXPLAIN LOGICAL для указанного SQL.")
+    @Tool(description = "Получить план EXPLAIN LOGICAL для запроса по queryid в рамках задачи taskId.")
     public TrinoResponse explainLogical(
-            @ToolParam(description = "Url для подключения") String url,
-            @ToolParam(description = "SQL-запрос, для которого нужно получить план") String sql
+            @ToolParam(description = "ID задачи оптимизации") UUID taskId,
+            @ToolParam(description = "ID запроса для оптимизации") String queryid
     ) {
-        return trinoDbService.explain(url, sql, TrinoExplainType.LOGICAL);
+        return trinoDbService.explain(taskId, queryid, TrinoExplainType.LOGICAL);
     }
 
-    @Tool(description = "Получить план EXPLAIN DISTRIBUTED для указанного SQL.")
+    @Tool(description = "Получить план EXPLAIN DISTRIBUTED для запроса по queryid в рамках задачи taskId.")
     public TrinoResponse explainDistributed(
-            @ToolParam(description = "Url для подключения") String url,
-            @ToolParam(description = "SQL-запрос, для которого нужно получить план") String sql
+            @ToolParam(description = "ID задачи оптимизации") UUID taskId,
+            @ToolParam(description = "ID запроса для оптимизации") String queryid
     ) {
-        return trinoDbService.explain(url, sql, TrinoExplainType.DISTRIBUTED);
+        return trinoDbService.explain(taskId, queryid, TrinoExplainType.DISTRIBUTED);
     }
 
-    @Tool(description = "Получить план EXPLAIN IO для указанного SQL; включает сводку ввода-вывода.")
+    @Tool(description = "Получить план EXPLAIN IO для запроса по queryid в рамках задачи taskId; включает сводку ввода-вывода.")
     public TrinoResponse explainIo(
-            @ToolParam(description = "Url для подключения") String url,
-            @ToolParam(description = "SQL-запрос, для которого нужно получить план") String sql
+            @ToolParam(description = "ID задачи оптимизации") UUID taskId,
+            @ToolParam(description = "ID запроса для оптимизации") String queryid
     ) {
-        return trinoDbService.explain(url, sql, TrinoExplainType.IO);
+        return trinoDbService.explain(taskId, queryid, TrinoExplainType.IO);
     }
 
-    @Tool(description = "Выполнить EXPLAIN ANALYZE для указанного SQL. ВНИМАНИЕ: запрос будет выполнен.")
+    @Tool(description = "Выполнить EXPLAIN ANALYZE для запроса по queryid в рамках задачи taskId. ВНИМАНИЕ: запрос будет выполнен.")
     public TrinoResponse explainAnalyze(
-            @ToolParam(description = "Url для подключения") String url,
-            @ToolParam(description = "SQL-запрос, для которого нужно получить метрики исполнения") String sql
+            @ToolParam(description = "ID задачи оптимизации") UUID taskId,
+            @ToolParam(description = "ID запроса для оптимизации") String queryid
     ) {
-        return trinoDbService.explain(url, sql, TrinoExplainType.ANALYZE);
+        return trinoDbService.explain(taskId, queryid, TrinoExplainType.ANALYZE);
     }
 
-    @Tool(description = "Выполнить EXPLAIN ANALYZE VERBOSE для указанного SQL. ВНИМАНИЕ: запрос будет выполнен.")
+    @Tool(description = "Выполнить EXPLAIN ANALYZE VERBOSE для запроса по queryid в рамках задачи taskId. ВНИМАНИЕ: запрос будет выполнен.")
     public TrinoResponse explainAnalyzeVerbose(
-            @ToolParam(description = "Url для подключения") String url,
-            @ToolParam(description = "SQL-запрос, для которого нужно получить подробные метрики исполнения") String sql
+            @ToolParam(description = "ID задачи оптимизации") UUID taskId,
+            @ToolParam(description = "ID запроса для оптимизации") String queryid
     ) {
-        return trinoDbService.explain(url, sql, TrinoExplainType.ANALYZE_VERBOSE);
+        return trinoDbService.explain(taskId, queryid, TrinoExplainType.ANALYZE_VERBOSE);
     }
 }

@@ -1,17 +1,15 @@
 package ru.javaboys.vibe_data.llm;
 
-import java.util.List;
-import java.util.Map;
-
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
 public class LlmRequest {
-    private String llmModel;
-    private Double temperature;
-    // id, по которому сохраняется контекст общений с LLM, необязательный
+    // id, по которому сохраняется контекст общения с LLM, необязательный
     private String conversationId;
 
     // системный промпт, хотя бы один раз должен быть передан, необязательный

@@ -1,7 +1,7 @@
 package ru.javaboys.vibe_data.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
@@ -11,8 +11,6 @@ import org.springframework.boot.autoconfigure.http.client.HttpClientProperties;
 import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
@@ -30,7 +28,6 @@ public class ChatClientConfig {
 
         return chatClientBuilder
                 .defaultAdvisors(
-                        MessageChatMemoryAdvisor.builder(chatMemory).build(),
                         new SimpleLoggerAdvisor()
                 )
                 .build();

@@ -12,7 +12,6 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
-import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.stereotype.Service;
 import ru.javaboys.vibe_data.config.LlmProperties;
 import ru.javaboys.vibe_data.monitoring.Monitored;
@@ -20,7 +19,6 @@ import ru.javaboys.vibe_data.monitoring.Monitored;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -74,11 +72,7 @@ public class LlmServiceImpl implements LlmService {
     private ChatClient.ChatClientRequestSpec prepareChatClient(LlmRequest request) {
         List<Message> messages = getPromptMessages(request);
 
-        OpenAiChatOptions options = OpenAiChatOptions.builder()
-                .model(Objects.requireNonNullElse(request.getLlmModel(), llmProperties.getLlmModel()))
-                .temperature(Objects.requireNonNullElse(request.getTemperature(), llmProperties.getTemperature()))
-                .build();
-        Prompt prompt = new Prompt(messages, options);
+        Prompt prompt = new Prompt(messages);
 
         var chatClientRequestSpec = chatClient.prompt(prompt);
 

@@ -1,15 +1,5 @@
 package ru.javaboys.vibe_data.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.UUID;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +17,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
 import ru.javaboys.vibe_data.agent.QueryOptimizerAgent;
 import ru.javaboys.vibe_data.api.dto.DdlStatementDto;
 import ru.javaboys.vibe_data.api.dto.NewTaskRequestDto;
@@ -40,6 +29,15 @@ import ru.javaboys.vibe_data.domain.TaskResult;
 import ru.javaboys.vibe_data.domain.TaskStatus;
 import ru.javaboys.vibe_data.domain.jsonb.RewrittenQuery;
 import ru.javaboys.vibe_data.domain.jsonb.SqlBlock;
+
+import java.util.List;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -132,24 +130,6 @@ class TaskControllerE2ETest {
         assertThat(resp.getBody().getQueries()).isNotEmpty();
     }
 
-    @Test
-    @DisplayName("Invalid LLM model should return 400 Bad Request")
-    void invalidModel_returns400() {
-        NewTaskRequestDto base = validRequest();
-        NewTaskRequestDto payload = NewTaskRequestDto.builder()
-                .llmModel("non-existent-model")
-                .temperature(base.getTemperature())
-                .url(base.getUrl())
-                .ddl(base.getDdl())
-                .queries(base.getQueries())
-                .build();
-
-        ResponseEntity<String> resp = restTemplate.postForEntity(baseUrl + "/new", payload, String.class);
-        assertEquals(HttpStatus.BAD_REQUEST, resp.getStatusCode());
-        assertNotNull(resp.getBody());
-        assertTrue(resp.getBody().contains("Invalid model name"));
-    }
-
     // ---- helpers ----
     private UUID createTaskAndGetId(NewTaskRequestDto payload) {
         ResponseEntity<NewTaskResponseDto> resp = restTemplate
@@ -175,8 +155,6 @@ class TaskControllerE2ETest {
 
     private NewTaskRequestDto validRequest() {
         return NewTaskRequestDto.builder()
-                .llmModel(null)
-                .temperature(0.1)
                 .url("jdbc:trino://localhost:18080/iceberg")
                 .ddl(List.of(
                         DdlStatementDto.builder().statement("CREATE TABLE t(x int)").build()

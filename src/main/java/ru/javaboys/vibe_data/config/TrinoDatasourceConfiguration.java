@@ -33,11 +33,12 @@ public class TrinoDatasourceConfiguration {
     }
 
     public static JdbcTemplate templateForUrl(String url) {
-        DataSource dataSource = new DataSourceProperties()
+        DataSourceProperties props = new DataSourceProperties();
+        props.setDriverClassName("io.trino.jdbc.TrinoDriver");
+        props.setUrl(url);
+        DataSource dataSource = props
                 .initializeDataSourceBuilder()
-                .url(url)
                 .build();
-
         return new JdbcTemplate(dataSource);
     }
 

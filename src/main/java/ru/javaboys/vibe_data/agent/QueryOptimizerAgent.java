@@ -30,6 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -114,7 +115,7 @@ public class QueryOptimizerAgent {
         log.info("Запросов к оптимизации: {}. Запускаем итеративный цикл.", sorted.size());
 
         // Стартуем прогрев кэша explain непосредственно перед началом итеративной оптимизации
-        Thread.ofPlatform().name("cache-filler").start(() -> sqlCacheWarmupService.runSqlCacheProcess(trinoUrl, sorted));
+        Thread.ofPlatform().name("cache-filler").start(() -> sqlCacheWarmupService.runSqlCacheProcess(task.getId(), sorted));
 
         // 4. копим изменения DDL по шагам
         Set<SqlBlock> accumulatedDdl = new LinkedHashSet<>();
@@ -138,12 +139,11 @@ public class QueryOptimizerAgent {
             PerQueryOptimizationOutput out;
             try {
                 out = runQueryOptimizationStep(
-                        task.getLlmModel(),
-                        task.getTemperature(),
                         system,
                         sysVars,
                         originalDdlJoined,
                         accumulatedDdl,
+                        task.getId(),
                         q
                 );
             } catch (Exception e) {
@@ -246,12 +246,11 @@ public class QueryOptimizerAgent {
     }
 
     private PerQueryOptimizationOutput runQueryOptimizationStep(
-            String llmModel,
-            Double temperature,
             String system,
             Map<String, Object> sysVars,
             String originalDdl,
             Set<SqlBlock> accumulatedDdl,
+            UUID taskId,
             QueryInput q
     ) {
         String userTemplate = PromptTemplates.QUERY_OPTIMIZATION_PROMPT;
@@ -262,16 +261,14 @@ public class QueryOptimizerAgent {
                 .map(SqlBlock::getStatement).collect(Collectors.joining("\n\n")));
         userVars.put("runquantity", q.getRunquantity());
         userVars.put("executiontime", Math.max(1, q.getExecutiontime()));
+        userVars.put("taskid", taskId.toString());
         userVars.put("queryid", q.getQueryid());
         userVars.put("query_sql", q.getQuery());
 
-        // Tools: отдаём набор инструментов EXPLAIN/ANALYZE + чтение read-only
         List<Object> tools = List.of(trinoExplainTools);
 
         return llmService.callAs(
                 LlmRequest.builder()
-                        .llmModel(llmModel)
-                        .temperature(temperature)
                         .systemMessage(system)
                         .systemVariables(sysVars)
                         .userMessage(userTemplate)
