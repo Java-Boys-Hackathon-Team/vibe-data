@@ -1,11 +1,15 @@
+# Локальная разработка: приложение вместе со своими сервисами.
+# Продовый запуск описан отдельным файлом docker-compose.prod.yml.
+
 services:
 
   vibe-data:
     build: .
-    command: ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-Dconfig.file=/app/config/application-prod.properties", "-jar", "vibe-data.jar"]
+    # Именно entrypoint, а не command: в образе задан ENTRYPOINT, и command стал
+    # бы набором аргументов приложения, а не новой командой запуска.
+    entrypoint: ["java", "-Dspring.config.additional-location=file:/app/config/application-prod.properties", "-jar", "/application/vibe-data.jar"]
     volumes:
       - './src/main/resources/application-prod.properties:/app/config/application-prod.properties'
-      - ./sources:/app/sources
     restart: always
     container_name: vibe-data
     ports:
@@ -23,8 +27,6 @@ services:
       - VALIDATION_ENABLED=true
     env_file:
       - .env
-    extra_hosts:
-      - "host.docker.internal:192.168.88.151"
     tty: true
     depends_on:
       - vibe-data-db
@@ -45,8 +47,11 @@ services:
       - POSTGRES_PASSWORD=pgadmin
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
 
+  # Панель нужна не всегда, поэтому она за профилем:
+  #   docker compose --profile tools up -d
   pgadmin:
     image: dpage/pgadmin4
+    profiles: [tools]
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: "kuramshin.py@yandex.ru"

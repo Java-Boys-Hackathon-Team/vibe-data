@@ -1,0 +1,40 @@
+name: vibe-data
+
+# Продовый запуск на сервере: поднимается только само приложение.
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# База, кэш, объектное хранилище, каталог Iceberg и Trino берутся из
+# common-infra - общих сервисов сервера, к которым подключены все проекты.
+# Поэтому docker-compose.yml здесь намеренно не подключается: описанные в нём
+# postgres, pgadmin, minio, redis, iceberg-rest и trino нужны только для
+# локальной разработки, где проект должен быть самодостаточным.
+#
+# Параметры подключения и токены лежат в .env.prod рядом с этим файлом,
+# права 600, в репозиторий не коммитятся.
+
+services:
+  vibe-data:
+    build: .
+    container_name: vibe-data
+    restart: always
+    # Именно entrypoint, а не command: в образе задан ENTRYPOINT, и command стал
+    # бы набором аргументов приложения, а не новой командой запуска.
+    entrypoint: ["java", "-Dspring.config.additional-location=file:/app/config/application-prod.properties", "-jar", "/application/vibe-data.jar"]
+    volumes:
+      - './src/main/resources/application-prod.properties:/app/config/application-prod.properties'
+    ports:
+      # Порт слушается на хосте: reverse proxy ходит в приложение через него.
+      - "8086:8080"
+    env_file:
+      - .env.prod
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      # За обратным прокси, который терминирует TLS.
+      - SERVER_FORWARD_HEADERS_STRATEGY=framework
+    networks: [common-infra]
+
+networks:
+  common-infra:
+    # Сеть поднята проектом common-infra; здесь она только используется.
+    external: true

@@ -19,9 +19,9 @@ BRANCH_NAME="$1"
 # =============================
 compose() {
   if docker compose version >/dev/null 2>&1; then
-    docker compose "$@"
+    docker compose "${COMPOSE_FILE_ARGS[@]}" "$@"
   elif command -v docker-compose >/dev/null 2>&1; then
-    docker-compose "$@"
+    docker-compose "${COMPOSE_FILE_ARGS[@]}" "$@"
   else
     echo "Docker Compose is not installed. Install Docker Compose v2 (docker compose) or v1 (docker-compose)." >&2
     exit 1
@@ -30,6 +30,14 @@ compose() {
 
 # Текущее имя проекта docker compose (по умолчанию = имя папки)
 PROJECT_NAME="${COMPOSE_PROJECT_NAME:-$(basename "$(pwd)")}"
+
+# На сервере приложение запускается отдельным compose-файлом: базу, кэш,
+# хранилище и Trino даёт common-infra, а docker-compose.yml с их локальными
+# копиями используется только на машине разработчика.
+COMPOSE_FILE_ARGS=(-f docker-compose.prod.yml)
+
+[ -f .env.prod ] || { echo "Нет .env.prod с параметрами подключения к common-infra"; exit 1; }
+docker network inspect common-infra >/dev/null 2>&1 || { echo "Нет сети common-infra - не поднята общая инфраструктура"; exit 1; }
 
 # =============================
 # 1) Получить обновления из git и переключиться на ветку
@@ -64,6 +72,12 @@ fi
 # =============================
 # 3) Сборка проекта (jar для образа)
 # =============================
+# Проект собирается под Java 21: на сервере версия по умолчанию другая, поэтому
+# JDK выбирается явно, иначе сборка падает на несовместимом байт-коде.
+JAVA_21_HOME=${JAVA_21_HOME:-/usr/lib/jvm/temurin-21-jdk-arm64}
+if [ -x "$JAVA_21_HOME/bin/javac" ]; then
+  export JAVA_HOME="$JAVA_21_HOME"
+fi
 ./gradlew clean bootJar -x test
 
 # =============================

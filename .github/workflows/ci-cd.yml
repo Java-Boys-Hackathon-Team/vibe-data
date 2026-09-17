@@ -47,9 +47,9 @@ jobs:
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
-          host: api.vibe-data.javaboys.ru
+          host: javaboys.ru
           username: ubuntu
-          port: 22
+          port: 50155
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/vibe-data

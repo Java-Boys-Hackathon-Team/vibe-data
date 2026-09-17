@@ -242,6 +242,50 @@ docker compose up -d
 
 ---
 
+## Продовое окружение
+
+На сервере проект **не** поднимает свои базы и сервисы: они берутся из общей
+инфраструктуры (`common-infra`), одной на все проекты.
+
+| Где | Чем запускается | Что поднимается |
+|---|---|---|
+| Машина разработчика | `docker-compose.yml` | приложение, PostgreSQL, Redis, MinIO, Iceberg REST, Trino, панель администрирования |
+| Сервер | `docker-compose.prod.yml` | только приложение, подключённое к сети `common-infra` |
+
+Общие сервисы на сервере: `common-postgres`, `common-redis`, `common-minio`,
+`common-iceberg-rest`, `common-trino`. Параметры подключения и токены лежат в
+`~/vibe-data/.env.prod` (права `600`) и в репозиторий не попадают:
+
+```properties
+PG_DATASOURCE_URL=jdbc:postgresql://common-postgres:5432/vibedata
+PG_NAME=vibedata
+PG_PASS=<пароль из add-project.sh>
+REDIS_HOST=common-redis
+REDIS_PORT=6379
+REDIS_PASSWORD=<пароль Redis из .env common-infra>
+TRINO_JDBC_URL=jdbc:trino://common-trino:8080/iceberg
+OPENAI_BASE_URL=<адрес совместимого с OpenAI API>
+OPENAI_API_KEY=<ключ или заглушка>
+```
+
+Место в общей инфраструктуре заводится один раз:
+`~/common-infra/scripts/add-project.sh vibedata --no-bucket` (данные Iceberg
+лежат в общем бакете `warehouse`, отдельный проекту не нужен).
+
+### Развёртывание на сервере
+
+```sh
+./deploy.sh main
+```
+
+Скрипт забирает ветку, собирает `bootJar` под Java 21, пересобирает образ и
+поднимает приложение продовым compose-файлом; перед этим проверяет, что рядом
+есть `.env.prod` и поднята сеть `common-infra`. То же самое делает workflow
+`CI/CD Pipeline for Vibe Data Project` (ручной запуск, параметр - имя ветки).
+
+Наружу приложение публикуется обратным прокси сервера:
+`./add-domain.sh vibe-data.javaboys.ru http://172.17.0.1:8086`.
+
 ## Конфигурация (ключевые параметры)
 
 **LLM:**
