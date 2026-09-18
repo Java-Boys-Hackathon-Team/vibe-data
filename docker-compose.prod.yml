@@ -29,6 +29,11 @@ services:
     env_file:
       - .env.prod
     environment:
+      # Журнал в JSON: сборщик логов получает готовые поля - уровень, логгер,
+      # сообщение, - и фильтр по уровню работает без разбора текста регулярками.
+      # Переменной, а не свойством в коде: значение относится к среде запуска,
+      # и пересобирать ради него образ незачем.
+      - LOGGING_STRUCTURED_FORMAT_CONSOLE=logstash
       - SPRING_PROFILES_ACTIVE=prod
       # За обратным прокси, который терминирует TLS.
       - SERVER_FORWARD_HEADERS_STRATEGY=framework
