@@ -22,6 +22,8 @@ services:
     # бы набором аргументов приложения, а не новой командой запуска.
     entrypoint: ["java", "-Dspring.config.additional-location=file:/app/config/application-prod.properties", "-jar", "/application/vibe-data.jar"]
     volumes:
+      # Агент трассировки: один файл на узел вместо копии в каждом образе.
+      - /opt/otel:/otel:ro
       - './src/main/resources/application-prod.properties:/app/config/application-prod.properties'
     ports:
       # Порт слушается на хосте: reverse proxy ходит в приложение через него.
@@ -34,6 +36,16 @@ services:
     env_file:
       - .env.prod
     environment:
+      # Трассировка запросов. Агент лежит файлом на узле и встраивается в
+      # процесс переменной выше - кода приложения это не требует.
+      # Метрики уже собираются с actuator, логи - с вывода контейнера,
+      # поэтому через агента они не дублируются.
+      - OTEL_SERVICE_NAME=vibe-data
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://172.17.0.1:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_TRACES_SAMPLER=parentbased_always_on
+      - OTEL_METRICS_EXPORTER=none
+      - OTEL_LOGS_EXPORTER=none
       # Журнал в JSON: сборщик логов получает готовые поля - уровень, логгер,
       # сообщение, - и фильтр по уровню работает без разбора текста регулярками.
       # Переменной, а не свойством в коде: значение относится к среде запуска,
@@ -55,13 +67,13 @@ services:
       - SERVER_FORWARD_HEADERS_STRATEGY=framework
       # Без этого JVM считает доступной память всего сервера и берёт под кучу
       # четверть от неё, не замечая предела контейнера.
-      - JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=60
+      - JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=60 -javaagent:/otel/opentelemetry-javaagent.jar
     # Сервис без интерфейса и заметно легче остальных: предел ниже.
     deploy:
       resources:
         limits:
           cpus: "2.0"
-          memory: 1G
+          memory: 1152M
     networks: [common-infra]
 
 networks:
