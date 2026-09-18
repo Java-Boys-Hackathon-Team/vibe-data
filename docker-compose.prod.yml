@@ -26,6 +26,11 @@ services:
     ports:
       # Порт слушается на хосте: reverse proxy ходит в приложение через него.
       - "8086:8080"
+      # Служебный порт с метриками. Отдельный от прикладного намеренно: на
+      # прикладном он был бы доступен снаружи через обратный прокси, и защита
+      # держалась бы на одной строке его конфигурации. Наружу порт не
+      # проброшен, метрики забирает Prometheus по локальной сети.
+      - "9086:9086"
     env_file:
       - .env.prod
     environment:
@@ -34,6 +39,21 @@ services:
       # Переменной, а не свойством в коде: значение относится к среде запуска,
       # и пересобирать ради него образ незачем.
       - LOGGING_STRUCTURED_FORMAT_CONSOLE=logstash
+      # Метрики приложения и JVM. Задаётся переменными, а не свойствами в коде:
+      # зависимости уже собраны в образе, и пересобирать его незачем.
+      - MANAGEMENT_SERVER_PORT=9086
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,prometheus,metrics
+      # Без гистограммы в Prometheus уезжают только сумма и количество, и
+      # квантили посчитать не из чего.
+      - MANAGEMENT_METRICS_DISTRIBUTION_PERCENTILES_HISTOGRAM_HTTP_SERVER_REQUESTS=true
+      # Диапазон задаёт число корзин, а значит и число рядов. Крайние значения
+      # выбраны по смыслу: быстрее 5 мс различать нечего, дольше 10 с - уже
+      # инцидент, а не разброс.
+      - MANAGEMENT_METRICS_DISTRIBUTION_MINIMUM_EXPECTED_VALUE_HTTP_SERVER_REQUESTS=5ms
+      - MANAGEMENT_METRICS_DISTRIBUTION_MAXIMUM_EXPECTED_VALUE_HTTP_SERVER_REQUESTS=10s
+      # Метка приложения на всех метриках: без неё ряды разных сервисов
+      # различаются только адресом.
+      - MANAGEMENT_METRICS_TAGS_APPLICATION=vibe-data
       - SPRING_PROFILES_ACTIVE=prod
       # За обратным прокси, который терминирует TLS.
       - SERVER_FORWARD_HEADERS_STRATEGY=framework
